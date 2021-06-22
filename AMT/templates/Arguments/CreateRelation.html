@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}Create Relation{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block header %}
+Create a Relation
+{% endblock %}
+{% block content %}
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}!
+  </div>
+{% elif success %}
+<div class="alert alert-success" role="alert">
+    {{ success }}!
+  </div>
+{% endif %}
+
+<form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
+<label for="relation">Title:</label><br>
+<input type="text" class="form-control" id="relation" name="relation" title="Enter a title" value="{{ request.form['relation'] }}"  placeholder="Enter a title for this relation" required><br>
+<label for="node1">From:</label><br>
+<input type="text" class="form-control" id="node1" name="node1" title="Enter the ID" value="{{ request.form['node1'] }}"  placeholder="Enter the ID of the first document" required><br>
+<label for="node2">To:</label><br>
+<input type="text" class="form-control" id="node2" name="node2" title="Enter the ID" value="{{ request.form['node2'] }}"  placeholder="Enter the ID of the second document" required><br>
+<div class="d-grid gap-2 mt-2">
+  <input type="submit" value="Create" class="btn btn-primary">
+  </div>
+  </form>
+{% endblock %}

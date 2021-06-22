@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Take Position{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block header %}
+Take a Position
+{% endblock %}
+{% block content %}
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}!
+  </div>
+{% elif success %}
+<div class="alert alert-success" role="alert">
+    {{ success }}!
+  </div>
+{% endif %}
+
+<form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
+<label for="title">Title:</label><br>
+<input type="text" class="form-control" id="title" name="title" title="Enter One-Line Title" value="{{ request.form['title'] }}" placeholder="Enter a one-line title" required><br>
+<label for="position">Position:</label><br>
+<textarea type="text" class="form-control" id="position" name="position" title="Enter a position" placeholder="Enter a position" required>{{ request.form['position'] }}</textarea><br>
+<div class="d-grid gap-2 mt-2">
+    <input type="submit" value="Create" class="btn btn-primary">
+  </div>
+  </form>
+{% endblock %}

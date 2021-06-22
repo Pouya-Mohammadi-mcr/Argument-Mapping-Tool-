@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block header %}
+Issues
+{% endblock %}
+{% block content %}
+
+{% for issue in issues %}
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{ issue['a.title'] }}</h5>
+    <p class="card-text">{{ issue['a.text']  }}</p>
+    <h6 class="card-subtitle mb-2 text-muted">{{ issue['a.date'] }}</h6>
+    <h6 class="card-subtitle mb-2 text-muted">{{ issue['ID(a)'] }}</h6>
+  </div>
+</div>
+{% if not loop.last %}
+  <hr>
+{% endif %}
+{% endfor %}
+
+{% endblock %}

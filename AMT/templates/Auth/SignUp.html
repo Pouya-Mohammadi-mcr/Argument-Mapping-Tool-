@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Register{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block header %}
+Register
+{% endblock %}
+{% block content %}
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}!
+  </div>
+{% endif %}
+<form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
+<label for="username">Username:</label><br>
+<input type="text" class="form-control" id="username" name="username" title="Enter Username" required><br>
+<label for="password">Password:</label><br>
+<input type="password" class="form-control" id="password" name="password" title="Enter Password" required><br>
+<div class="d-grid gap-2 mt-2">
+  <input type="submit" value="Register" class="btn btn-primary">
+  </div>
+  </form>
+{% endblock %}

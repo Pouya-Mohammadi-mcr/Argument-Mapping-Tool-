@@ -4,7 +4,7 @@ from flask import (
 from werkzeug.exceptions import abort
 
 from AMT.Auth import loginRequired
-from AMT.Database import getDB, getIssues
+from AMT.Database import Database
 from AMT.Database import User
 
 
@@ -12,7 +12,7 @@ bp = Blueprint('Arguments', __name__)
 
 @bp.route('/')
 def index():
-    issues = getIssues()
+    issues = Database().findIssues()
     return render_template('Arguments/Home.html', issues=issues)
 #MATCH (n:Person) RETURN { id: ID(n), name: n.name } as user LIMIT 5
 

@@ -4,19 +4,27 @@ from flask import (
 from werkzeug.exceptions import abort
 
 from AMT.Auth import loginRequired
-from AMT.Database import getDB
-from AMT.Models import User
+from AMT.Database import getDB, getIssues
+from AMT.Database import User
 
 
 bp = Blueprint('Arguments', __name__)
 
 @bp.route('/')
 def index():
-    graph = getDB()
-    issues = graph.run("MATCH (a:Issue) RETURN ID(a), a.title, a.date, a.text ").data()
-    print (issues)
+    issues = getIssues()
     return render_template('Arguments/Home.html', issues=issues)
 #MATCH (n:Person) RETURN { id: ID(n), name: n.name } as user LIMIT 5
+
+@bp.route("/issue/<int:issueID>")
+def representIssue(issueID):
+    graph = getDB()
+    matcher = NodeMatcher(graph)
+    issue = matcher.get(issueID)
+
+    # positions taken to this = query
+    pass
+
 
 @bp.route("/createArgument", methods=('GET', 'POST'))
 @loginRequired

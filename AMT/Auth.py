@@ -5,7 +5,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from py2neo import Graph, Node, Relationship
-from AMT.Models import User
+from AMT.Database import User
 
 bp = Blueprint('Auth', __name__, url_prefix='/Auth')
 

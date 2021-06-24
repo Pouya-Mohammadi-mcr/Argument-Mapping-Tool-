@@ -4,7 +4,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-from AMT.Database import User
+from AMT.Database import Database
 
 bp = Blueprint('Auth', __name__, url_prefix='/Auth')
 
@@ -19,7 +19,7 @@ def signUp():
             error = 'Username is required'
         elif not password:
             error = 'Password is required'
-        if not User(username).register(password):
+        if not Database().register(username,password):
             error = "Username already exists"
         else:
             session['username'] = username
@@ -41,9 +41,9 @@ def signIn():
             error = 'Username is required'
         elif not password:
             error = 'Password is required'
-        if not User(username).find():
+        if not Database().findUser(username): 
             error = 'Incorrect username'
-        elif not User(username).matchPassword(password):
+        elif not Database().matchPassword(username,password): 
             error = 'Incorrect password'
 
         if error is None:
@@ -62,7 +62,8 @@ def load_logged_in_user():
     if username is None:
         g.user = None
     else:
-        g.user = User(username).find()
+        g.user = Database().findUser(username) 
+        print (g.user['username'])
 
 @bp.route('/signOut')
 def signOut():

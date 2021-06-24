@@ -5,7 +5,6 @@ from werkzeug.exceptions import abort
 
 from AMT.Auth import loginRequired
 from AMT.Database import Database
-from AMT.Database import User
 
 
 bp = Blueprint('Arguments', __name__)
@@ -14,16 +13,15 @@ bp = Blueprint('Arguments', __name__)
 def index():
     issues = Database().findIssues()
     return render_template('Arguments/Home.html', issues=issues)
-#MATCH (n:Person) RETURN { id: ID(n), name: n.name } as user LIMIT 5
 
-@bp.route("/issue/<int:issueID>")
-def representIssue(issueID):
-    graph = getDB()
-    matcher = NodeMatcher(graph)
-    issue = matcher.get(issueID)
+#@bp.route("/issue/<int:issueID>")
+#def representIssue(issueID):
+#    graph = getDB()
+#    matcher = NodeMatcher(graph)
+#    issue = matcher.get(issueID)
 
     # positions taken to this = query
-    pass
+#    pass
 
 
 @bp.route("/createArgument", methods=('GET', 'POST'))
@@ -43,7 +41,7 @@ def createArgument():
             error = "Your argument cannot be empty"
     
         if error == None:
-            User(g.user['username']).createArgument(title, argument)
+            Database().createArgument(g.user['username'],title,argument)
             success = "Your argument is succesfully created"
     
     return render_template('Arguments/CreateArgument.html', error=error, success=success)
@@ -65,7 +63,7 @@ def createIssue():
             error = "Your issue cannot be empty"
     
         if error == None:
-            User(g.user['username']).createIssue(title, issue)
+            Database().createIssue(g.user['username'],title,issue)
             success = "Your issue is succesfully created"
     
     return render_template('Arguments/CreateIssue.html', error=error, success=success)
@@ -87,7 +85,7 @@ def createPosition():
             error = "Your position cannot be empty"
     
         if error == None:
-            User(g.user['username']).createPosition(title, position)
+            Database().createPosition(g.user['username'],title,position)
             success = "Your position is succesfully created"
     
     return render_template('Arguments/CreatePosition.html', error=error, success=success)
@@ -110,7 +108,7 @@ def createRelation():
             error = "Documents' IDs cannot be empty"
     
         if error == None:
-            User(g.user['username']).createRelation(node1, node2, relation)
+            Database().createRelation(g.user['username'],node1,node2,relation)
             success = "The relation is succesfully created"
     
     return render_template('Arguments/CreateRelation.html', error=error, success=success)

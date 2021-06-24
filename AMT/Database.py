@@ -51,46 +51,129 @@ class Database():
         )
         issues = tx.run(query)
         return [row["i"] for row in issues]
+                
+    def findUser(self, username):
+        with self.driver.session() as session:
+            result = session.read_transaction(self.findAndReturnUser,username)
+            if len(result)>0:
+                #only one user with the username
+                return result[0]
+            else:
+                return False
+
+    @staticmethod
+    def findAndReturnUser(tx, username):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "RETURN u"
+        )
+        user = tx.run(query, username=username)
+        return [row["u"] for row in user]
+
+    def register(self, username, password):
+        if not self.findUser(username):
+            with self.driver.session() as session:
+            # Write transactions allow the driver to handle retries and transient errors
+                session.write_transaction(self.createAndReturnUser, username, password)
+                return True
+        else:
+            return False
+
+    @staticmethod
+    def createAndReturnUser(tx, username, password):
+        query = (
+            "CREATE (u:User { username: $username, password: $password }) "
+        )
+        #fix .encode 
+        tx.run(query, username=username, password= bcrypt.hashpw(password.encode(), bcrypt.gensalt()) )
+
+    def createArgument(self, username, title, text):
+        with self.driver.session() as session:
+            session.write_transaction(self.createAndReturnArgument, username, title, text)
+
+    @staticmethod
+    def createAndReturnArgument(tx, username, title, text):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "CREATE (a:Argument { title: $title, text: $text, date: $date }) "
+            "CREATE (u)-[:MADE]->(a) "
+        )
+        #fix .encode 
+        tx.run(query, title=title, text=text, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+
+    def createIssue(self, username, title, text):
+        with self.driver.session() as session:
+            session.write_transaction(self.createAndReturnIssue, username, title, text)
+
+    @staticmethod
+    def createAndReturnIssue(tx, username, title, text):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "CREATE (i:Issue { title: $title, text: $text, date: $date }) "
+            "CREATE (u)-[:RAISED]->(i) "
+        )
+        #fix .encode 
+        tx.run(query, title=title, text=text, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+
+    def createPosition(self, username, title, text):
+        with self.driver.session() as session:
+            session.write_transaction(self.createAndReturnPosition, username, title, text)
+
+    @staticmethod
+    def createAndReturnPosition(tx, username, title, text):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "CREATE (p:Position { title: $title, text: $text, date: $date }) "
+            "CREATE (u)-[:TOOK]->(p) "
+        )
+        #fix .encode 
+        tx.run(query, title=title, text=text, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
 
 
-class User:
-    def __init__(self, username):
-        self.username = username
-        self.graph = Database()
+    def matchPassword(self, username, givenPassword):
+        with self.driver.session() as session:
+            result = session.write_transaction(self.findAndReturnPassword, username)
+            if len(result)>0:
+                storedPassword = result[0]
+                if bcrypt.checkpw(givenPassword.encode(), storedPassword):
+                    return True
+                else:
+                    return False 
 
-    def find(self):
-        pass
-    
-    def register(self, password):
-        pass
+    @staticmethod
+    def findAndReturnPassword(tx, username):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "RETURN u.password AS password"
+        )
+        result = tx.run(query, username=username)
+        return [row["password"] for row in result]
 
-    def createArgument(self, title, text):
-        pass
+    def createRelation(self, username, node1, node2, relationType):
+        with self.driver.session() as session:
+            session.write_transaction(self.createAndReturnRelation, username, node1, node2, relationType)
 
-    def createIssue(self, title, text):
-        pass
+    @staticmethod
+    def createAndReturnRelation(tx, username, node1, node2, relationType):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "MATCH (n1) "
+            "WHERE id(n1) = $node1 "
+            "MATCH (n2) "
+            "WHERE id(n2) = $node2 "
+            "CREATE (r:Relation { title: $title, date: $date }) "
+            "CREATE (u)-[:CREATED]->(r) "
+            "CREATE (r)-[:FROM]->(n1) "
+            "CREATE (r)-[:TO]->(n2) "
 
-    def createPosition(self, title, text):
-        pass
-
-    def createRelation(self, node1, node2, relationType):
-        pass
-
-    def matchPassword(self, givenPassword):
-
-        pass
-
-#def getIssuePositions(issueID):
-#    graph = getDB()
-#    matcher = NodeMatcher(graph)
-#    issue = matcher.get(issueID)
-
-
-#def close_db(e=None):
-#    db = g.pop('db', None)
-
-#    if db is not None:
-#        db.close()
-
+        )
+        #fix .encode 
+        tx.run(query, title=relationType, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"), node1=int(node1), node2=int(node2))
 
 

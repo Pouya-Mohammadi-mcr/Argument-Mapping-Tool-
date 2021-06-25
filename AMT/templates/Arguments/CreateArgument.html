@@ -2,6 +2,21 @@
 {% block title %}Make Argument{% endblock %}
 {% block head %}
   {{ super() }}
+  <script>
+
+function anyValCheck(checkBoxID, relation) {
+  const checkBox = document.getElementById(checkBoxID);
+  const textBox = document.getElementById("relation");
+  if (checkBoxID == "customRadio"){
+    textBox.value = "";
+    textBox.readOnly = false;              
+    }
+  else{
+    textBox.value = relation;
+    textBox.readOnly = true; 
+  }
+}
+  </script>
 {% endblock %}
 {% block header %}
 Make an Argument
@@ -18,12 +33,44 @@ Make an Argument
 {% endif %}
 
 <form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
-<label for="title">Title:</label><br>
-<input type="text" class="form-control" id="title" name="title" title="Enter One-Line Title" value="{{ request.form['title'] }}"  placeholder="Enter a one-line title" required><br>
 <label for="argument">Argument:</label><br>
 <textarea type="text" class="form-control" id="argument" name="argument" title="Enter Argument" placeholder="Enter your argument" required>{{ request.form['argument'] }}</textarea><br>
+
+<p>
+  <button class="btn btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    + Connect to an element
+  </button>
+</p>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+
+    <label for="elementID">Element ID:</label>
+    <input type="text" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter the element ID" value="{{ request.form['elementID'] }}" ><br>
+
+    <label for="radioRow">Relation:</label>
+    <div class="row px-3 pb-1" id="radioRow"> 
+      <div class="form-check form-check-inline col">
+          <input class="form-check-input" type="radio" name="radio" id="supportRadio" value="option1" onclick="anyValCheck('supportRadio', 'Supports')">
+          <label class="form-check-label" for="supportRadio">Supports</label>
+      </div>
+    <div class="form-check form-check-inline col">
+        <input class="form-check-input" type="radio" name="radio" id="opposeRadio" value="option2" onclick="anyValCheck('opposeRadio', 'Opposes')">
+        <label class="form-check-label" for="opposeRadio">Opposes</label>
+    </div>
+  <div class="form-check form-check-inline col">
+      <input class="form-check-input" type="radio" name="radio" id="customRadio" value="option3" onclick="anyValCheck('customRadio', '')" checked>
+      <label class="form-check-label" for="customRadio">Custom</label>
+  </div>
+</div> 
+
+    <input type="text" class="form-control" id="relation" name="relation" title="Enter the relation" placeholder="Enter the relation" value="{{ request.form['relation'] }}" ><br>
+
+  </div>
+</div>
+
 <div class="d-grid gap-2 mt-2">
   <input type="submit" value="Create" class="btn btn-primary">
-  </div>
+</div>
+
   </form>
 {% endblock %}

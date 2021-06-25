@@ -11,8 +11,7 @@ Issues
 {% for issue in issues %}
 <div class="card" style="width: 18rem;">
   <div class="card-body">
-    <h5 class="card-title">{{ issue['title'] }}</h5>
-    <p class="card-text">{{ issue['text']  }}</p>
+    <p class="card-text">{{ issue['title']  }}</p>
     <h6 class="card-subtitle mb-2 text-muted">{{ issue['date'] }}</h6>
     <h6 class="card-subtitle mb-2 text-muted">{{ issue.id }}</h6>
   </div>

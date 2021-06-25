@@ -1,6 +1,3 @@
-import sqlite3
-
-import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 import csv
@@ -88,50 +85,75 @@ class Database():
         #fix .encode 
         tx.run(query, username=username, password= bcrypt.hashpw(password.encode(), bcrypt.gensalt()) )
 
-    def createArgument(self, username, title, text):
+    def createArgument(self, username, title):
         with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnArgument, username, title, text)
+            session.write_transaction(self.createAndReturnArgument, username, title)
 
     @staticmethod
-    def createAndReturnArgument(tx, username, title, text):
+    def createAndReturnArgument(tx, username, title):
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "CREATE (a:Argument { title: $title, text: $text, date: $date }) "
+            "CREATE (a:Argument { title: $title, date: $date }) "
             "CREATE (u)-[:MADE]->(a) "
         )
-        #fix .encode 
-        tx.run(query, title=title, text=text, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
 
-    def createIssue(self, username, title, text):
+    def createArgumentAndRelation(self, username, title, elementID, relation ):
         with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnIssue, username, title, text)
+            session.write_transaction(self.createAndReturnArgumentAndRelation, username, title, elementID, relation)
 
     @staticmethod
-    def createAndReturnIssue(tx, username, title, text):
+    def createAndReturnArgumentAndRelation(tx, username, title, elementID, relation):
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "CREATE (i:Issue { title: $title, text: $text, date: $date }) "
+            "MATCH (e) "
+            "WHERE id(e) = $elementID "
+
+            "CREATE (a:Argument { title: $title, date: $date }) "
+            "CREATE (u)-[:MADE]->(a) "
+
+            "CREATE (r:Relation { title: $relation, date: $date }) "
+            "CREATE (u)-[:CREATED]->(r) "
+            "CREATE (r)-[:FROM]->(a) "
+            "CREATE (r)-[:TO]->(e) "
+        )
+        tx.run(query, title=title, username=username, elementID=int(elementID), relation=relation, date=datetime.datetime.now().strftime("%B %d, %Y"))
+
+    def createIssue(self, username, title):
+        with self.driver.session() as session:
+            session.write_transaction(self.createAndReturnIssue, username, title)
+
+    @staticmethod
+    def createAndReturnIssue(tx, username, title):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "CREATE (i:Issue { title: $title, date: $date }) "
             "CREATE (u)-[:RAISED]->(i) "
         )
         #fix .encode 
-        tx.run(query, title=title, text=text, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
 
-    def createPosition(self, username, title, text):
+    def createPosition(self, username, title, issueID):
         with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnPosition, username, title, text)
+            session.write_transaction(self.createAndReturnPosition, username, title, issueID)
 
     @staticmethod
-    def createAndReturnPosition(tx, username, title, text):
+    def createAndReturnPosition(tx, username, title, issueID):
+        #Does not check if the issueID is actually an ID for an ISSUE
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "CREATE (p:Position { title: $title, text: $text, date: $date }) "
+            "MATCH (i) "
+            "WHERE id(i) = $issueID "
+            "CREATE (p:Position { title: $title, date: $date }) "
             "CREATE (u)-[:TOOK]->(p) "
+            "CREATE (p)-[:ANSWERS]->(i) "
         )
         #fix .encode 
-        tx.run(query, title=title, text=text, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
 
 
     def matchPassword(self, username, givenPassword):

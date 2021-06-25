@@ -18,8 +18,6 @@ Raise an Issue
 {% endif %}
 
 <form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
-<label for="title">Title:</label><br>
-<input type="text" class="form-control" id="title" name="title" title="Enter One-Line Title" value="{{ request.form['title'] }}"  placeholder="Enter a one-line title" required><br>
 <label for="issue">Issue:</label><br>
 <textarea class="form-control" id="issue" name="issue" title="Enter issue" placeholder="Enter issue" required>{{ request.form['issue'] }}</textarea><br>
 <div class="d-grid gap-2 mt-2">

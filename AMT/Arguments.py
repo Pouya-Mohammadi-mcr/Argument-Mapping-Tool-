@@ -32,17 +32,20 @@ def createArgument():
 
     if request.method == 'POST':
 
-        title = request.form['title']
         argument = request.form['argument']
+        elementID = request.form['elementID']
+        relation = request.form['relation']
 
-        if not title:
-            error = "You must give your argument a title"
-        elif not argument:
+        if not argument:
             error = "Your argument cannot be empty"
     
         if error == None:
-            Database().createArgument(g.user['username'],title,argument)
-            success = "Your argument is succesfully created"
+            if elementID and relation:
+                Database().createArgumentAndRelation(g.user['username'],argument, elementID, relation)
+                success = "Your argument and its relation are succesfully created"
+            else:
+                Database().createArgument(g.user['username'],argument)
+                success = "Your argument is succesfully created"
     
     return render_template('Arguments/CreateArgument.html', error=error, success=success)
 
@@ -54,16 +57,13 @@ def createIssue():
 
     if request.method == 'POST':
 
-        title = request.form['title']
         issue = request.form['issue']
 
-        if not title:
-            error = "You must give your issue a title"
-        elif not issue:
+        if not issue:
             error = "Your issue cannot be empty"
     
         if error == None:
-            Database().createIssue(g.user['username'],title,issue)
+            Database().createIssue(g.user['username'],issue)
             success = "Your issue is succesfully created"
     
     return render_template('Arguments/CreateIssue.html', error=error, success=success)
@@ -76,16 +76,16 @@ def createPosition():
 
     if request.method == 'POST':
 
-        title = request.form['title']
         position = request.form['position']
+        issueID = request.form['issueID']
 
-        if not title:
-            error = "You must give your position a title"
-        elif not position:
+        if not position:
             error = "Your position cannot be empty"
+        elif not issueID:
+            error = "You should specify the issue you are taking a position on"
     
         if error == None:
-            Database().createPosition(g.user['username'],title,position)
+            Database().createPosition(g.user['username'],position, issueID)
             success = "Your position is succesfully created"
     
     return render_template('Arguments/CreatePosition.html', error=error, success=success)

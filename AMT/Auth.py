@@ -63,7 +63,6 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = Database().findUser(username) 
-        print (g.user['username'])
 
 @bp.route('/signOut')
 def signOut():

@@ -18,10 +18,10 @@ Take a Position
 {% endif %}
 
 <form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
-<label for="title">Title:</label><br>
-<input type="text" class="form-control" id="title" name="title" title="Enter One-Line Title" value="{{ request.form['title'] }}" placeholder="Enter a one-line title" required><br>
 <label for="position">Position:</label><br>
-<textarea type="text" class="form-control" id="position" name="position" title="Enter a position" placeholder="Enter a position" required>{{ request.form['position'] }}</textarea><br>
+<input type="text" class="form-control" id="position" name="position" title="Enter a position" placeholder="Enter a position" value="{{ request.form['position'] }}" required><br>
+<label for="issueID">issue ID:</label><br>
+<input type="text" class="form-control" id="issueID" name="issueID" title="Enter a issueID" placeholder="Enter a issueID" value="{{ request.form['issueID'] }}" required><br>
 <div class="d-grid gap-2 mt-2">
     <input type="submit" value="Create" class="btn btn-primary">
   </div>

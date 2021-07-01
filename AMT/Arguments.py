@@ -14,16 +14,6 @@ def index():
     issues = Database().findIssues()
     return render_template('Arguments/Home.html', issues=issues)
 
-#@bp.route("/issue/<int:issueID>")
-#def representIssue(issueID):
-#    graph = getDB()
-#    matcher = NodeMatcher(graph)
-#    issue = matcher.get(issueID)
-
-    # positions taken to this = query
-#    pass
-
-
 @bp.route("/createArgument", methods=('GET', 'POST'))
 @loginRequired
 def createArgument():
@@ -41,10 +31,13 @@ def createArgument():
     
         if error == None:
             if elementID and relation:
-                Database().createArgumentAndRelation(g.user['username'],argument, elementID, relation)
-                success = "Your argument and its relation are succesfully created"
+                result = Database().createArgumentAndRelation(g.user['username'],argument, elementID, relation)
+                if result == "ERROR":
+                    error= "The element you are referring to does not exist"
+                else:
+                    success = "Your argument and its relation are succesfully created"
             else:
-                Database().createArgument(g.user['username'],argument)
+                result = Database().createArgument(g.user['username'],argument)
                 success = "Your argument is succesfully created"
     
     return render_template('Arguments/CreateArgument.html', error=error, success=success)
@@ -85,8 +78,11 @@ def createPosition():
             error = "You should specify the issue you are taking a position on"
     
         if error == None:
-            Database().createPosition(g.user['username'],position, issueID)
-            success = "Your position is succesfully created"
+            result = Database().createPosition(g.user['username'],position, issueID)
+            if result == "ERROR":
+                error= "The issue you are referring to does not exist"
+            else:
+                success = "Your position is succesfully created"
     
     return render_template('Arguments/CreatePosition.html', error=error, success=success)
 
@@ -108,7 +104,10 @@ def createRelation():
             error = "Documents' IDs cannot be empty"
     
         if error == None:
-            Database().createRelation(g.user['username'],node1,node2,relation)
-            success = "The relation is succesfully created"
+            result = Database().createRelation(g.user['username'],node1,node2,relation)
+            if result == "ERROR":
+                error= "One or both the elements you are referring to do not exist"
+            else:
+                success = "The relation is succesfully created"
     
     return render_template('Arguments/CreateRelation.html', error=error, success=success)

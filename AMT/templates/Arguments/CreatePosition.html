@@ -21,7 +21,7 @@ Take a Position
 <label for="position">Position:</label><br>
 <input type="text" class="form-control" id="position" name="position" title="Enter a position" placeholder="Enter a position" value="{{ request.form['position'] }}" required><br>
 <label for="issueID">issue ID:</label><br>
-<input type="text" class="form-control" id="issueID" name="issueID" title="Enter a issueID" placeholder="Enter a issueID" value="{{ request.form['issueID'] }}" required><br>
+<input type="number" class="form-control" id="issueID" name="issueID" title="Enter a issueID" placeholder="Enter a issueID" value="{{ request.form['issueID'] }}" required><br>
 <div class="d-grid gap-2 mt-2">
     <input type="submit" value="Create" class="btn btn-primary">
   </div>

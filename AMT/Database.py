@@ -7,13 +7,11 @@ import bcrypt
 import uuid
 import datetime
 
-
 from neo4j import GraphDatabase
 import logging
-from neo4j.exceptions import ServiceUnavailable
+from neo4j.exceptions import *
 
 class Database():
-    #this should substitute getDB
     def __init__(self):
         if 'db' not in g:
             absolutePath = os.path.dirname(os.path.abspath(__file__))
@@ -35,10 +33,9 @@ class Database():
         self.driver.close()
         
     def findIssues(self):
-        with self.driver.session() as session:
+        with self.driver.session(database=current_app.config['database']) as session:
             result = session.read_transaction(self.findAndReturnIssues)
             return result
-
 
     @staticmethod
     def findAndReturnIssues(tx):
@@ -47,10 +44,15 @@ class Database():
             "RETURN i"
         )
         issues = tx.run(query)
-        return [row["i"] for row in issues]
-                
+        try:
+            return [row["i"] for row in issues]
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise    
+
     def findUser(self, username):
-        with self.driver.session() as session:
+        with self.driver.session(database=current_app.config['database']) as session:
             result = session.read_transaction(self.findAndReturnUser,username)
             if len(result)>0:
                 #only one user with the username
@@ -66,13 +68,18 @@ class Database():
             "RETURN u"
         )
         user = tx.run(query, username=username)
-        return [row["u"] for row in user]
+        try:
+            return [row["u"] for row in user]
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
 
     def register(self, username, password):
         if not self.findUser(username):
-            with self.driver.session() as session:
+            with self.driver.session(database=current_app.config['database']) as session:
             # Write transactions allow the driver to handle retries and transient errors
-                session.write_transaction(self.createAndReturnUser, username, password)
+                result = session.write_transaction(self.createAndReturnUser, username, password)
                 return True
         else:
             return False
@@ -83,11 +90,18 @@ class Database():
             "CREATE (u:User { username: $username, password: $password }) "
         )
         #fix .encode 
-        tx.run(query, username=username, password= bcrypt.hashpw(password.encode(), bcrypt.gensalt()) )
+        result = tx.run(query, username=username, password= bcrypt.hashpw(password.encode(), bcrypt.gensalt()) )
+        try:
+            return result
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
 
     def createArgument(self, username, title):
-        with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnArgument, username, title)
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnArgument, username, title)
+            return result
 
     @staticmethod
     def createAndReturnArgument(tx, username, title):
@@ -96,12 +110,22 @@ class Database():
             "WHERE u.username = $username "
             "CREATE (a:Argument { title: $title, date: $date }) "
             "CREATE (u)-[:MADE]->(a) "
+            "RETURN a"
         )
-        tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
 
     def createArgumentAndRelation(self, username, title, elementID, relation ):
-        with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnArgumentAndRelation, username, title, elementID, relation)
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnArgumentAndRelation, username, title, elementID, relation)
+            return result
 
     @staticmethod
     def createAndReturnArgumentAndRelation(tx, username, title, elementID, relation):
@@ -118,12 +142,20 @@ class Database():
             "CREATE (u)-[:CREATED]->(r) "
             "CREATE (r)-[:FROM]->(a) "
             "CREATE (r)-[:TO]->(e) "
+
+            "RETURN e"
         )
-        tx.run(query, title=title, username=username, elementID=int(elementID), relation=relation, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        result = tx.run(query, title=title, username=username, elementID=int(elementID), relation=relation, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except:
+            return "ERROR"
 
     def createIssue(self, username, title):
-        with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnIssue, username, title)
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnIssue, username, title)
 
     @staticmethod
     def createAndReturnIssue(tx, username, title):
@@ -134,11 +166,19 @@ class Database():
             "CREATE (u)-[:RAISED]->(i) "
         )
         #fix .encode 
-        tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+
+        try:
+            return result
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
 
     def createPosition(self, username, title, issueID):
-        with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnPosition, username, title, issueID)
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnPosition, username, title, issueID)
+            return result
 
     @staticmethod
     def createAndReturnPosition(tx, username, title, issueID):
@@ -151,13 +191,20 @@ class Database():
             "CREATE (p:Position { title: $title, date: $date }) "
             "CREATE (u)-[:TOOK]->(p) "
             "CREATE (p)-[:ANSWERS]->(i) "
+            "RETURN i"
+
         )
         #fix .encode 
-        tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
-
+        result = tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except:
+            return "ERROR"
 
     def matchPassword(self, username, givenPassword):
-        with self.driver.session() as session:
+        with self.driver.session(database=current_app.config['database']) as session:
             result = session.write_transaction(self.findAndReturnPassword, username)
             if len(result)>0:
                 storedPassword = result[0]
@@ -174,11 +221,17 @@ class Database():
             "RETURN u.password AS password"
         )
         result = tx.run(query, username=username)
-        return [row["password"] for row in result]
+        try:
+            return [row["password"] for row in result]
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
 
     def createRelation(self, username, node1, node2, relationType):
-        with self.driver.session() as session:
-            session.write_transaction(self.createAndReturnRelation, username, node1, node2, relationType)
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnRelation, username, node1, node2, relationType)
+            return result
 
     @staticmethod
     def createAndReturnRelation(tx, username, node1, node2, relationType):
@@ -194,8 +247,58 @@ class Database():
             "CREATE (r)-[:FROM]->(n1) "
             "CREATE (r)-[:TO]->(n2) "
 
+            "RETURN n1, n2"
+
         )
         #fix .encode 
-        tx.run(query, title=relationType, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"), node1=int(node1), node2=int(node2))
+        result = tx.run(query, title=relationType, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"), node1=int(node1), node2=int(node2))
+        try:
+            foundNodes = ( [{"n1": row["n1"].id, "n2": row["n2"].id}
+                    for row in result] )
+            if len(foundNodes) == 0:
+                return "ERROR"
+            else:
+                return foundNodes
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    def deleteUser(self, username):
+        with self.driver.session(database=current_app.config['database']) as session:
+            session.write_transaction(self.findAndDeleteUser,username)
 
 
+    @staticmethod
+    def findAndDeleteUser(tx, username):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "DELETE (u)"
+        )
+        try:
+            tx.run(query, username=username)
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    def deleteArgument(self, argID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            session.write_transaction(self.findAndDeleteArgument,argID)
+
+
+    @staticmethod
+    def findAndDeleteArgument(tx, argID):
+        query = (
+            "MATCH (a:Argument) "
+            "WHERE id(a) = $argID "
+            "DETACH DELETE (a)"
+        )
+        try:
+            tx.run(query, argID=argID)
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise

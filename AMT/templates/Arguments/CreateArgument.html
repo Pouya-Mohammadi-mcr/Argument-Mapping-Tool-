@@ -4,10 +4,9 @@
   {{ super() }}
   <script>
 
-function anyValCheck(checkBoxID, relation) {
-  const checkBox = document.getElementById(checkBoxID);
+function selectRadio(radioBoxID, relation) {
   const textBox = document.getElementById("relation");
-  if (checkBoxID == "customRadio"){
+  if (radioBoxID == "customRadio"){
     textBox.value = "";
     textBox.readOnly = false;              
     }
@@ -45,20 +44,20 @@ Make an Argument
   <div class="card card-body">
 
     <label for="elementID">Element ID:</label>
-    <input type="text" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter the element ID" value="{{ request.form['elementID'] }}" ><br>
+    <input type="number" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter the element ID" value="{{ request.form['elementID'] }}" ><br>
 
     <label for="radioRow">Relation:</label>
     <div class="row px-3 pb-1" id="radioRow"> 
       <div class="form-check form-check-inline col">
-          <input class="form-check-input" type="radio" name="radio" id="supportRadio" value="option1" onclick="anyValCheck('supportRadio', 'Supports')">
+          <input class="form-check-input" type="radio" name="radio" id="supportRadio" value="option1" onclick="selectRadio('supportRadio', 'Supports')">
           <label class="form-check-label" for="supportRadio">Supports</label>
       </div>
     <div class="form-check form-check-inline col">
-        <input class="form-check-input" type="radio" name="radio" id="opposeRadio" value="option2" onclick="anyValCheck('opposeRadio', 'Opposes')">
+        <input class="form-check-input" type="radio" name="radio" id="opposeRadio" value="option2" onclick="selectRadio('opposeRadio', 'Opposes')">
         <label class="form-check-label" for="opposeRadio">Opposes</label>
     </div>
   <div class="form-check form-check-inline col">
-      <input class="form-check-input" type="radio" name="radio" id="customRadio" value="option3" onclick="anyValCheck('customRadio', '')" checked>
+      <input class="form-check-input" type="radio" name="radio" id="customRadio" value="option3" onclick="selectRadio('customRadio', '')" checked>
       <label class="form-check-label" for="customRadio">Custom</label>
   </div>
 </div> 

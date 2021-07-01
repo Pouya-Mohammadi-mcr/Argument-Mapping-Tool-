@@ -56,7 +56,7 @@ def createIssue():
             error = "Your issue cannot be empty"
     
         if error == None:
-            Database().createIssue(g.user['username'],issue)
+            result = Database().createIssue(g.user['username'],issue)
             success = "Your issue is succesfully created"
     
     return render_template('Arguments/CreateIssue.html', error=error, success=success)

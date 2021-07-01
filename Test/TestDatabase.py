@@ -48,17 +48,52 @@ class TestDatabase(unittest.TestCase):
             argument = self.db.createArgument("Pouya","some text for the test argument")
             argID = argument.id
             #delete the argument created
-            self.db.deleteArgument(argID)
-        self.assertEqual(argument['title'], "some text for the test argument")
+            self.db.deleteElement(argID)
+        self.assertEqual(argument['title'], "some text for the test argument", "The argument creation transaction was not run correctly")
 
     def testCreateArgumentAndRelation(self):
         with self.app.app_context():
-            relatedElement = self.db.createArgumentAndRelation("Pouya","some text for the second test argument", 6, "Supports")
-            relatedElementID = relatedElement.id
+            relatedElements = self.db.createArgumentAndRelation("Pouya","some text for the second test argument", 6, "Supports")
+            argID = relatedElements[0]['a']
+            relationID = relatedElements[0]['r']
+            relatedElementID = relatedElements[0]['e']
             #delete the argument created
-            self.db.deleteArgument(relatedElementID)
-        self.assertEqual(relatedElement.id, 6)
+            self.db.deleteElement(argID)
+            self.db.deleteElement(relationID)
 
+        self.assertEqual(relatedElementID, 6, "The argument and relation creation transaction was not run correctly")
+
+    def testCreateIssue(self):
+        with self.app.app_context():
+            issue = self.db.createIssue("Pouya","some text for the test issue")
+            #delete the issue created
+            self.db.deleteElement(issue.id)
+        self.assertEqual(issue['title'], "some text for the test issue" ,"The issue was not created")
+
+    def testCreatePosition(self):
+        with self.app.app_context():
+            positionAndIssue = self.db.createPosition("Pouya","some text for the test position", 1)
+            posID = positionAndIssue[0]['p']
+            issueID = positionAndIssue[0]['i']
+            #delete the position created
+            self.db.deleteElement(posID)
+        self.assertEqual(issueID, 1,"The position was not created")
+
+    def testMatchPassword(self):
+        with self.app.app_context():
+            self.assertTrue(self.db.matchPassword("Jack","sewnuw-sYhqyb-9domti"))
+            self.assertFalse(self.db.matchPassword("Jack","12345"))
+
+    def testCreateRelation(self):
+        with self.app.app_context():
+            elementsAndRelation = self.db.createRelation("Pouya", 7, 3, "Opposes")
+            relationID = elementsAndRelation[0]['r']
+            node1ID = elementsAndRelation[0]['n1']
+            node2ID = elementsAndRelation[0]['n2']
+            #delete the relation created
+            self.db.deleteElement(relationID)
+        self.assertEqual(node1ID, 7,"The relation was not created")
+        self.assertEqual(node2ID, 3,"The relation was not created")
 
 if __name__ == '__main__':
     unittest.main()

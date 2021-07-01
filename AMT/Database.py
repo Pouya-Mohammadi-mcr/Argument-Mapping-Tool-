@@ -143,19 +143,26 @@ class Database():
             "CREATE (r)-[:FROM]->(a) "
             "CREATE (r)-[:TO]->(e) "
 
-            "RETURN e"
+            "RETURN a, r, e"
         )
         result = tx.run(query, title=title, username=username, elementID=int(elementID), relation=relation, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
-            record = result.single()
-            value = record.value()
-            return value
-        except:
-            return "ERROR"
+            relatedElements = ( [{"a": row["a"].id, "r": row["r"].id, "e": row["e"].id}
+                    for row in result] )
+            if len(relatedElements) == 0:
+                return "ERROR"
+            else:
+                return relatedElements
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
 
     def createIssue(self, username, title):
         with self.driver.session(database=current_app.config['database']) as session:
             result = session.write_transaction(self.createAndReturnIssue, username, title)
+            return result
 
     @staticmethod
     def createAndReturnIssue(tx, username, title):
@@ -164,12 +171,15 @@ class Database():
             "WHERE u.username = $username "
             "CREATE (i:Issue { title: $title, date: $date }) "
             "CREATE (u)-[:RAISED]->(i) "
+            "Return i"
         )
         #fix .encode 
         result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
 
         try:
-            return result
+            record = result.single()
+            value = record.value()
+            return value
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -191,17 +201,22 @@ class Database():
             "CREATE (p:Position { title: $title, date: $date }) "
             "CREATE (u)-[:TOOK]->(p) "
             "CREATE (p)-[:ANSWERS]->(i) "
-            "RETURN i"
+            "RETURN i, p"
 
         )
         #fix .encode 
         result = tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
-            record = result.single()
-            value = record.value()
-            return value
-        except:
-            return "ERROR"
+            relatedElements = ( [{"i": row["i"].id, "p": row["p"].id}
+                    for row in result] )
+            if len(relatedElements) == 0:
+                return "ERROR"
+            else:
+                return relatedElements
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
 
     def matchPassword(self, username, givenPassword):
         with self.driver.session(database=current_app.config['database']) as session:
@@ -247,13 +262,13 @@ class Database():
             "CREATE (r)-[:FROM]->(n1) "
             "CREATE (r)-[:TO]->(n2) "
 
-            "RETURN n1, n2"
+            "RETURN n1, r, n2"
 
         )
         #fix .encode 
         result = tx.run(query, title=relationType, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"), node1=int(node1), node2=int(node2))
         try:
-            foundNodes = ( [{"n1": row["n1"].id, "n2": row["n2"].id}
+            foundNodes = ( [{"n1": row["n1"].id, "r": row["r"].id, "n2": row["n2"].id}
                     for row in result] )
             if len(foundNodes) == 0:
                 return "ERROR"
@@ -284,20 +299,20 @@ class Database():
                 query=query, exception=exception))
             raise
 
-    def deleteArgument(self, argID):
+    def deleteElement(self, elementID):
         with self.driver.session(database=current_app.config['database']) as session:
-            session.write_transaction(self.findAndDeleteArgument,argID)
+            session.write_transaction(self.findAndDeleteElement,elementID)
 
 
     @staticmethod
-    def findAndDeleteArgument(tx, argID):
+    def findAndDeleteElement(tx, elementID):
         query = (
-            "MATCH (a:Argument) "
-            "WHERE id(a) = $argID "
-            "DETACH DELETE (a)"
+            "MATCH (e) "
+            "WHERE id(e) = $elementID "
+            "DETACH DELETE (e)"
         )
         try:
-            tx.run(query, argID=argID)
+            tx.run(query, elementID=elementID)
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))

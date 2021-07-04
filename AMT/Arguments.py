@@ -111,3 +111,10 @@ def createRelation():
                 success = "The relation is succesfully created"
     
     return render_template('Arguments/CreateRelation.html', error=error, success=success)
+
+
+@bp.route("/showPositions/<int:issueID>")
+def showPositions(issueID):
+    positions = Database().getPositions(issueID)
+    issue = Database().getSingleElement(issueID)
+    return render_template('Arguments/ShowPositions.html', positions=positions, issue=issue)

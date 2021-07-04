@@ -95,5 +95,26 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(node1ID, 7,"The relation was not created")
         self.assertEqual(node2ID, 3,"The relation was not created")
 
+#starting TDD
+
+    def testGetPositions(self):
+        with self.app.app_context():
+            positions = self.db.getPositions(1)
+            self.assertEqual(positions[0]['title'], "Yes", "The first position's title was not returned correctly")
+            self.assertEqual(positions[0]['id'], 2, "The first position's id was not returned correctly")
+            self.assertEqual(positions[0]['date'], "June 30, 2021", "The first position's date was not returned correctly")
+            self.assertEqual(positions[1]['title'], "No", "The second position's title was not returned correctly")
+            self.assertEqual(positions[1]['id'], 6, "The second position's id was not returned correctly")
+            self.assertEqual(positions[1]['date'], "June 30, 2021", "The second position's date was not returned correctly")
+
+    def testGetSignleElement(self):
+        with self.app.app_context():
+            element = self.db.getSingleElement(1)
+            self.assertEqual(element['title'],"Should X company be allowed to sponsor a conference? " , "The element's title was not returned correctly")
+            self.assertEqual(element.id, 1, "The element's id was not returned correctly")
+            self.assertEqual(element['date'], "June 30, 2021", "The element's date was not returned correctly")
+        
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -317,3 +317,57 @@ class Database():
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
             raise
+
+#starting TDD
+
+    def getPositions(self, issueID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.findAndReturnPositions, issueID)
+            return result
+
+    @staticmethod
+    def findAndReturnPositions(tx, issueID):
+        query = (
+            "MATCH (i:Issue) "
+            "WHERE id(i) = $issueID "
+            "MATCH (i)<-[:ANSWERS]-(p:Position) "
+            "RETURN p "
+            "ORDER BY id(p)"
+        )
+        result = tx.run(query, issueID=issueID)
+        try:
+            foundPositions = ( [{"title": row["p"]["title"], "id": row["p"].id, "date": row["p"]["date"]}
+                    for row in result] )
+            if len(foundPositions) == 0:
+                return "ERROR"
+            else:
+                return foundPositions
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    def getSingleElement(self, elementID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.findAndReturnElement, elementID)
+            return result
+
+    @staticmethod
+    def findAndReturnElement(tx, elementID):
+        query = (
+            "MATCH (e) "
+            "WHERE id(e) = $elementID "
+            "Return e"
+        )
+        #fix .encode 
+        result = tx.run(query,  elementID=elementID)
+
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise

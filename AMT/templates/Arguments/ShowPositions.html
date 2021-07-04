@@ -2,31 +2,30 @@
 {% block title %}Home{% endblock %}
 {% block head %}
   {{ super() }}
-
 {% endblock %}
 {% block header %}
-Topics
+Positions taken on: <br><a  href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}" class="text-primary h3"> {{issue['title']}} </a>
 {% endblock %}
 {% block content %}
 
-{% for issue in issues %}
+{% for position in positions %}
 <div class="card">
   <div class="card-header" style="height: 3.2rem;">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text bg-transparent border-0">Topic ID:</span>
+        <span class="input-group-text bg-transparent border-0">Position ID:</span>
       </div>
-      <input type="text" class="form-control bg-transparent border-0" id="id" value='{{ issue.id }}' readonly>
+      <input type="text" class="form-control bg-transparent border-0" id="id" value='{{ position["id"] }}' readonly>
       <div class="input-group-append">
         <button type="button" class="btn btn-sm btn-outline-primary" onclick="copyToClipboard()">Copy ID</button>
       </div>
     </div>
   </div>
     <div class="card-body">
-    <a class="card-text" href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}">{{ issue['title']  }}</a>
+    <a class="card-text">{{ position['title']  }}</a>
   </div>
   <div class="card-footer">
-    <small class="text-muted">{{ issue['date'] }}</small>
+    <small class="text-muted">{{ position['date'] }}</small>
   </div>
 </div>
 {% if not loop.last %}

@@ -2,20 +2,6 @@
 {% block title %}Make Argument{% endblock %}
 {% block head %}
   {{ super() }}
-  <script>
-
-function selectRadio(radioBoxID, relation) {
-  const textBox = document.getElementById("relation");
-  if (radioBoxID == "customRadio"){
-    textBox.value = "";
-    textBox.readOnly = false;              
-    }
-  else{
-    textBox.value = relation;
-    textBox.readOnly = true; 
-  }
-}
-  </script>
 {% endblock %}
 {% block header %}
 Make an Argument

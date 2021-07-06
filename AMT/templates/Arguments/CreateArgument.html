@@ -30,8 +30,18 @@ Make an Argument
   <div class="card card-body">
 
     <label for="elementID">Element ID:</label>
+    {% if element %}
+      <input type="number" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter an element ID" value="{{ element }}"><br>
+      <script>
+      const textBox = document.getElementById("elementID");
+      textBox.readOnly = true; 
+      $(document).ready(function(){
+      $(".collapse").collapse('show');
+      });
+      </script>
+    {% else %}
     <input type="number" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter the element ID" value="{{ request.form['elementID'] }}" ><br>
-
+    {% endif %}
     <label for="radioRow">Relation:</label>
     <div class="row px-3 pb-1" id="radioRow"> 
       <div class="form-check form-check-inline col">

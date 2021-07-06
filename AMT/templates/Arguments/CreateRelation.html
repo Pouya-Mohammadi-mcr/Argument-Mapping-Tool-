@@ -18,8 +18,29 @@ Create a Relation
 {% endif %}
 
 <form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
-<label for="relation">Title:</label><br>
-<input type="text" class="form-control" id="relation" name="relation" title="Enter a title" value="{{ request.form['relation'] }}"  placeholder="Enter a title for this relation" required><br>
+
+<label for="radioRow">Relation:</label>
+<div class="row px-3 pb-1" id="radioRow"> 
+  <div class="form-check form-check-inline col">
+      <input class="form-check-input" type="radio" name="radio" id="supportRadio" value="option1" onclick="selectRadio('supportRadio', 'Supports')">
+      <label class="form-check-label" for="supportRadio">Supports</label>
+  </div>
+<div class="form-check form-check-inline col">
+    <input class="form-check-input" type="radio" name="radio" id="opposeRadio" value="option2" onclick="selectRadio('opposeRadio', 'Opposes')">
+    <label class="form-check-label" for="opposeRadio">Opposes</label>
+</div>
+<div class="form-check form-check-inline col">
+  <input class="form-check-input" type="radio" name="radio" id="complementRadio" value="option3" onclick="selectRadio('complementRadio', 'Complements')">
+  <label class="form-check-label" for="complementRadio">Complements</label>
+</div>
+<div class="form-check form-check-inline col">
+  <input class="form-check-input" type="radio" name="radio" id="customRadio" value="option4" onclick="selectRadio('customRadio', '')" checked>
+  <label class="form-check-label" for="customRadio">Custom</label>
+</div>
+</div> 
+
+<input type="text" class="form-control" id="relation" name="relation" title="Name this relation" placeholder="Name this relation" value="{{ request.form['relation'] }}" required><br>
+
 <label for="node1">From:</label><br>
 <input type="number" class="form-control" id="node1" name="node1" title="Enter the ID" value="{{ request.form['node1'] }}"  placeholder="Enter the ID of the first element" required><br>
 <label for="node2">To:</label><br>

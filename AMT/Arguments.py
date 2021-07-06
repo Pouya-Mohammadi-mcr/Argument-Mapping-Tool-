@@ -15,12 +15,16 @@ def index():
     issues = Database().findIssues()
     return render_template('Arguments/Home.html', issues=issues)
 
+@bp.route("/createArgument/<int:element>", methods=('GET', 'POST'))
 @bp.route("/createArgument", methods=('GET', 'POST'))
 @loginRequired
-def createArgument():
+def createArgument(element = ""):
     error = None   
     success = None
 
+    if request.method == 'GET':
+        element = element
+        
     if request.method == 'POST':
 
         argument = request.form['argument']
@@ -41,7 +45,7 @@ def createArgument():
                 result = Database().createArgument(g.user['username'],argument)
                 success = "Your argument is succesfully created"
     
-    return render_template('Arguments/CreateArgument.html', error=error, success=success)
+    return render_template('Arguments/CreateArgument.html', error=error, success=success, element=element)
 
 @bp.route("/createIssue", methods=('GET', 'POST'))
 @loginRequired
@@ -68,8 +72,10 @@ def createIssue():
 def createPosition(issue = ""):
     error = None   
     success = None
+
     if request.method == 'GET':
         issue = issue
+
     elif request.method == 'POST':
 
         position = request.form['position']

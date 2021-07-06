@@ -14,13 +14,18 @@
   </div>
   <div class="card-body">
     <h5 class="card-title">{{element['title']}}</h5>
-    <a href="{{ url_for('Arguments.createPosition', issue = element.id ) }}" class="btn btn-outline-primary">Make a new argument</a>
+    <a href="{{ url_for('Arguments.createArgument', element = element.id ) }}" class="btn btn-outline-primary">Make a new argument</a>
   </div>
 </div>
 
 {% endblock %}
 
 {% block content %}
+
+{% set elementLabel = []%}
+{% for label in element.labels %}
+{{ elementLabel.append(label) or "" }}
+{% endfor %}
 
 {% if error %}
 <div class="alert alert-danger" role="alert">
@@ -37,7 +42,7 @@
 {% endfor %}
 
 {% for relation in relations %}
-<div class="h3 text-center"> Argument(s) that <span   class="text-primary"> {{relation}} </span>"{{element['title']}}"</div>
+<div class="h3"> Argument(s) that <span   class="text-primary"> {{relation}} </span> this <span>{{elementLabel[0]}}</span></div>
 {% for argument in arguments %}
 {% if argument['relation'] == relation %}
 

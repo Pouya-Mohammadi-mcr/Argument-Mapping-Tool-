@@ -22,7 +22,7 @@ def create_app(test_config=None):
         app.config.from_pyfile('config.py', silent=True)
 
 #not testing neo4j
-        app.config['database']='testdatabase'
+        app.config['database']='neo4j'
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)

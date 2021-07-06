@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block header %}
+
+
+<div class="card" style="width: 22rem;">
+  <div class="card-header bg-light">
+    {% for label in element.labels %}
+    {{label}}
+    {% endfor %}
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{element['title']}}</h5>
+    <a href="{{ url_for('Arguments.createPosition', issue = element.id ) }}" class="btn btn-outline-primary">Make a new argument</a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}!
+  </div>
+{% else %}
+
+
+{% set relations = [] %}
+{% for argument in arguments %}
+{% if argument['relation'] not in relations %}
+{{ relations.append(argument['relation']) or "" }}
+{% endif %}
+{% endfor %}
+
+{% for relation in relations %}
+<div class="h3 text-center"> Argument(s) that <span   class="text-primary"> {{relation}} </span>"{{element['title']}}"</div>
+{% for argument in arguments %}
+{% if argument['relation'] == relation %}
+
+<div class="card my-3">
+  <div class="card-header">
+
+    <div class="d-flex justify-content-end mb-1">
+        <a class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="{{'#'~'x'~argument['id']}}" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fas fa-bars"></i> 
+
+        </a>
+    </div>
+
+<div class="collapse" id="{{'x'~argument['id']}}"">
+ 
+    <div class="input-group mb-1">
+      <div class="input-group-prepend">
+        <span class="input-group-text bg-transparent border-0">Argument ID:</span>
+      </div>
+      <input type="text" class="form-control bg-transparent border-0" id="{{argument['id']}}" value='{{ argument["id"] }}' readonly>
+      <div class="input-group-append">
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick=copyToClipboard({{ argument['id']|safe }});>Copy argument ID</button>
+      </div>
+    </div>
+    <div class="input-group mb-1">
+        <div class="input-group-prepend">
+          <span class="input-group-text bg-transparent border-0">Relation ID:</span>
+        </div>
+        <input type="text" class="form-control bg-transparent border-0" id="{{ argument['relationID'] }}" value='{{ argument["relationID"] }}' readonly>
+        <div class="input-group-append">
+          <a href="{{ url_for('Arguments.showArguments', elementID = argument['relationID']) }}" class="btn btn-sm btn-outline-primary">Open relation page</a>
+          <button type="button" class="btn btn-sm btn-outline-primary" onclick=copyToClipboard({{ argument['relationID']|safe }});>Copy relation ID</button>
+        </div>
+      </div>
+  </div>
+  </div>
+    <div class="card-body">
+    <a href="{{ url_for('Arguments.showArguments', elementID = argument['id'] ) }}" class="card-text">{{ argument['title']  }}</a>
+  </div>
+  <div class="card-footer">
+    <small class="text-muted"> Created on {{ argument['date'] }}</small>
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+
+{% if not loop.last %}
+  <hr>
+{% endif %}
+
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}

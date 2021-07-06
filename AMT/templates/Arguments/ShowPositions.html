@@ -4,10 +4,26 @@
   {{ super() }}
 {% endblock %}
 {% block header %}
-Positions taken on: <br><a  href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}" class="text-primary h3"> {{issue['title']}} </a>
+
+<div class="card" style="width: 22rem;">
+  <div class="card-header bg-light">
+    Topic
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{issue['title']}}</h5>
+    <a href="{{ url_for('Arguments.createPosition', issue = issue.id ) }}" class="btn btn-outline-primary">Take a new position</a>
+  </div>
+</div>
+
 {% endblock %}
 {% block content %}
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}!
+  </div>
+{% else %}
 
+<p class="h3 text-primary">Positions made:</p>
 {% for position in positions %}
 <div class="card">
   <div class="card-header" style="height: 3.2rem;">
@@ -15,22 +31,24 @@ Positions taken on: <br><a  href="{{ url_for('Arguments.showPositions',issueID =
       <div class="input-group-prepend">
         <span class="input-group-text bg-transparent border-0">Position ID:</span>
       </div>
-      <input type="text" class="form-control bg-transparent border-0" id="id" value='{{ position["id"] }}' readonly>
+      <input type="text" class="form-control bg-transparent border-0" id="{{ position['id'] }}" value='{{ position["id"] }}' readonly>
       <div class="input-group-append">
-        <button type="button" class="btn btn-sm btn-outline-primary" onclick="copyToClipboard()">Copy ID</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick=copyToClipboard({{ position['id']|safe }});>Copy ID</button>
       </div>
     </div>
   </div>
     <div class="card-body">
-    <a class="card-text">{{ position['title']  }}</a>
+    <a href="{{ url_for('Arguments.showArguments', elementID = position['id'] ) }}" class="card-text">{{ position['title']  }}</a>
   </div>
   <div class="card-footer">
-    <small class="text-muted">{{ position['date'] }}</small>
+    <small class="text-muted"> Created on {{ position['date'] }}</small>
   </div>
 </div>
 {% if not loop.last %}
   <hr>
 {% endif %}
 {% endfor %}
+
+{% endif %}
 
 {% endblock %}

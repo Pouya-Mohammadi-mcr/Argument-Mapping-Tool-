@@ -110,11 +110,26 @@ class TestDatabase(unittest.TestCase):
     def testGetSignleElement(self):
         with self.app.app_context():
             element = self.db.getSingleElement(1)
+            self.assertEqual((list(element.labels)[0]),"Issue", "The elemets label was not returned correctly")
             self.assertEqual(element['title'],"Should X company be allowed to sponsor a conference? " , "The element's title was not returned correctly")
             self.assertEqual(element.id, 1, "The element's id was not returned correctly")
             self.assertEqual(element['date'], "June 30, 2021", "The element's date was not returned correctly")
         
-
-
+    def testGetArguments(self):
+        with self.app.app_context():
+            arguments = self.db.getArguments(2)
+            self.assertEqual(arguments[0]['relation'],"Supports", "The first argument's relation was not returned correctly")
+            self.assertEqual(arguments[0]['relationID'],4, "The first argument's relation ID was not returned correctly")
+            self.assertEqual(arguments[0]['title'],"X is a popular company.", "The first supporting argument's title was not returned correctly")
+            self.assertEqual(arguments[1]['relation'],"Opposes", "The second argument's relation was not returned correctly")
+            self.assertEqual(arguments[1]['title'],"This will encourage arms production.", "The opposing argument's title was not returned correctly")
+            self.assertEqual(arguments[2]['relation'],"Asks a question", "The third argument's relation was not returned correctly")
+            self.assertEqual(arguments[2]['title'],"Does it mean it should be able to sponsor any conference? or some specific ones?", "The custom argument's title was not returned correctly")
+ 
+#            print(arguments)
+#            self.assertEqual(opposingArgs[0]['title'],"This will encourage arms production.", "The first opposing argument's title was not returned correctly")
+#            self.assertEqual(otherArgs[0]['title'],"Does it mean it should be able to sponsor any conference? or some specific ones?")
+#            self.assertEqual(otherArgs[0]['type'],"Asks a question")
+# , opposingArgs, otherArgs 
 if __name__ == '__main__':
     unittest.main()

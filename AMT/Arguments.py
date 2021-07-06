@@ -1,3 +1,4 @@
+from os import error
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -61,13 +62,15 @@ def createIssue():
     
     return render_template('Arguments/CreateIssue.html', error=error, success=success)
 
+@bp.route("/createPosition/<int:issue>", methods=('GET', 'POST'))
 @bp.route("/createPosition", methods=('GET', 'POST'))
 @loginRequired
-def createPosition():
+def createPosition(issue = ""):
     error = None   
     success = None
-
-    if request.method == 'POST':
+    if request.method == 'GET':
+        issue = issue
+    elif request.method == 'POST':
 
         position = request.form['position']
         issueID = request.form['issueID']
@@ -84,7 +87,7 @@ def createPosition():
             else:
                 success = "Your position is succesfully created"
     
-    return render_template('Arguments/CreatePosition.html', error=error, success=success)
+    return render_template('Arguments/CreatePosition.html', error=error, success=success, issue=issue)
 
 @bp.route("/createRelation", methods=('GET', 'POST'))
 @loginRequired
@@ -115,6 +118,18 @@ def createRelation():
 
 @bp.route("/showPositions/<int:issueID>")
 def showPositions(issueID):
+    error = None
     positions = Database().getPositions(issueID)
+    if positions == "ERROR":
+        error = "No positions have been taken on this issue"
     issue = Database().getSingleElement(issueID)
-    return render_template('Arguments/ShowPositions.html', positions=positions, issue=issue)
+    return render_template('Arguments/ShowPositions.html', positions=positions, issue=issue, error=error)
+
+@bp.route("/showArguments/<int:elementID>")
+def showArguments(elementID):
+    error = None
+    arguments = Database().getArguments(elementID)
+    if arguments == "ERROR":
+        error = "No arguments have been made on this element"
+    element = Database().getSingleElement(elementID)
+    return render_template('Arguments/ShowArguments.html', arguments=arguments, element=element, error=error)

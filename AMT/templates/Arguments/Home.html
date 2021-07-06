@@ -16,9 +16,9 @@ Topics
       <div class="input-group-prepend">
         <span class="input-group-text bg-transparent border-0">Topic ID:</span>
       </div>
-      <input type="text" class="form-control bg-transparent border-0" id="id" value='{{ issue.id }}' readonly>
+      <input type="text" class="form-control bg-transparent border-0" id="{{ issue.id }}" value='{{ issue.id }}' readonly>
       <div class="input-group-append">
-        <button type="button" class="btn btn-sm btn-outline-primary" onclick="copyToClipboard()">Copy ID</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick=copyToClipboard({{ issue.id|safe }});>Copy ID</button>
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@ Topics
     <a class="card-text" href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}">{{ issue['title']  }}</a>
   </div>
   <div class="card-footer">
-    <small class="text-muted">{{ issue['date'] }}</small>
+    <small class="text-muted"> Created on {{ issue['date'] }}</small>
   </div>
 </div>
 {% if not loop.last %}

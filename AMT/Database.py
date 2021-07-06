@@ -371,3 +371,35 @@ class Database():
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
             raise
+
+    def getArguments(self, elementID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.findAndReturnArguments, elementID)
+            return result
+
+    @staticmethod
+    def findAndReturnArguments(tx, elementID):
+        query = (
+            "MATCH (e) "
+            "WHERE id(e) = $elementID "
+            "WITH (e)"
+            "MATCH (e)<-[:TO]-(r:Relation) "
+            "WITH (r)"
+            "MATCH (a:Argument)<-[:FROM]-(r:Relation) "
+            "RETURN a, r.title, id(r) "
+            "ORDER BY id(a)"
+
+        )
+        result = tx.run(query, elementID=elementID)
+        try:
+            arguments = ( [{"relation": row['r.title'], "relationID": row['id(r)'], "title": row["a"]["title"], "id": row["a"].id, "date": row["a"]["date"]}
+                    for row in result] )
+            if len(arguments) == 0:
+                return "ERROR"
+            else:
+                return arguments
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise

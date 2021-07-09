@@ -15,16 +15,19 @@ def index():
     issues = Database().findIssues()
     return render_template('Arguments/Home.html', issues=issues)
 
-@bp.route("/createArgument/<int:element>", methods=('GET', 'POST'))
 @bp.route("/createArgument", methods=('GET', 'POST'))
 @loginRequired
-def createArgument(element = ""):
+def createArgument():
     error = None   
     success = None
 
     if request.method == 'GET':
-        element = element
-        
+        rel = request.args.get('rel', None)
+        element = request.args.get('element', None)
+        if element:
+            element = int(element)
+            print(element)
+
     if request.method == 'POST':
 
         argument = request.form['argument']
@@ -45,7 +48,7 @@ def createArgument(element = ""):
                 result = Database().createArgument(g.user['username'],argument)
                 success = "Your argument is succesfully created"
     
-    return render_template('Arguments/CreateArgument.html', error=error, success=success, element=element)
+    return render_template('Arguments/CreateArgument.html', error=error, success=success, element=element, rel=rel)
 
 @bp.route("/createIssue", methods=('GET', 'POST'))
 @loginRequired
@@ -121,6 +124,29 @@ def createRelation():
     
     return render_template('Arguments/CreateRelation.html', error=error, success=success)
 
+@bp.route("/findElement", methods=('GET', 'POST'))
+def findElement():
+    error = None  
+
+    if request.method == 'POST':
+
+        elementID = int(request.form['elementID'])
+
+        if elementID == None:
+            error = "You must specify the element ID"
+        else:
+            element = Database().getSingleElement(elementID)
+            if element == "ERROR":
+                error = "Element not found"
+            elif list(element.labels)[0] == "Issue":
+                return redirect(url_for('Arguments.showPositions',issueID = elementID))
+            elif list(element.labels)[0] == "Position" or list(element.labels)[0] == "Argument" or list(element.labels)[0] == "Relation":
+                return redirect(url_for('Arguments.showArguments',elementID = elementID))
+            else:
+                error = "Element not found"
+
+    return render_template('Arguments/Find.html', error=error)
+ 
 
 @bp.route("/showPositions/<int:issueID>")
 def showPositions(issueID):

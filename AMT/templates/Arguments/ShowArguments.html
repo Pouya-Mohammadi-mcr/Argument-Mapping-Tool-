@@ -11,7 +11,7 @@
     {% for label in element.labels %}
     {{label}}
     {% endfor %}
-  </div>
+</div>
   <div class="card-body">
     <h5 class="card-title">{{element['title']}}</h5>
     <a href="{{ url_for('Arguments.createArgument', element = element.id ) }}" class="btn btn-outline-primary">Make a new argument</a>
@@ -27,6 +27,27 @@
 {{ elementLabel.append(label) or "" }}
 {% endfor %}
 
+{% set relations = [] %}
+{% for argument in arguments %}
+{% if argument['relation'] not in relations %}
+{{ relations.append(argument['relation']) or "" }}
+{% endif %}
+{% endfor %}
+
+
+
+{% if "Supports" not in relations %}
+<div class="alert alert-info" role="alert">
+  <a href="{{ url_for('Arguments.createArgument', element = element.id, rel='Supports' ) }}" class=""> <i class="far fa-plus-square"></i> Be the first to support this element! </a>
+  </div>
+  {% endif %}
+
+  {% if "Opposes" not in relations %}
+  <div class="alert alert-info" role="alert">
+    <a href="{{ url_for('Arguments.createArgument', element = element.id, rel='Opposes' ) }}" class=""> <i class="far fa-plus-square"></i> Be the first to oppose this element! </a>
+    </div>
+    {% endif %}
+
 {% if error %}
 <div class="alert alert-danger" role="alert">
     {{ error }}!
@@ -34,12 +55,7 @@
 {% else %}
 
 
-{% set relations = [] %}
-{% for argument in arguments %}
-{% if argument['relation'] not in relations %}
-{{ relations.append(argument['relation']) or "" }}
-{% endif %}
-{% endfor %}
+
 
 {% for relation in relations %}
 <div class="h3"> Argument(s) that <span   class="text-primary"> {{relation}} </span> this <span>{{elementLabel[0]}}</span></div>

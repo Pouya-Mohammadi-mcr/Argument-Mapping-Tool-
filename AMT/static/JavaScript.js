@@ -1,3 +1,7 @@
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
 //For default relations
 function selectRadio(radioBoxID, relation) {
     const textBox = document.getElementById("relation");

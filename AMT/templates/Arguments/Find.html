@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}Find{% endblock %}
+{% block head %}
+  {{ super() }}
+
+{% endblock %}
+{% block header %}
+Topics
+{% endblock %}
+{% block content %}
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}!
+  </div>
+  {% else %}
+  <div class="alert alert-warning" role="alert">
+    Something went wrong!
+  </div>
+{% endif%}
+{% endblock %}

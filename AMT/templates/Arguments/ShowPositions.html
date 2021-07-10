@@ -41,7 +41,7 @@
     <a href="{{ url_for('Arguments.showArguments', elementID = position['id'] ) }}" class="card-text">{{ position['title']  }}</a>
   </div>
   <div class="card-footer">
-    <small class="text-muted"> Created on {{ position['date'] }}</small>
+    <small class="text-muted"> Created on {{ position['date'] }} by {{position['author']}}</small>
   </div>
 </div>
 {% if not loop.last %}

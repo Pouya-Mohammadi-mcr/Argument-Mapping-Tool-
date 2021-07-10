@@ -99,7 +99,7 @@
     <a href="{{ url_for('Arguments.showArguments', elementID = argument['id'] ) }}" class="card-text">{{ argument['title']  }}</a>
   </div>
   <div class="card-footer">
-    <small class="text-muted"> Created on {{ argument['date'] }}</small>
+    <small class="text-muted"> Created on {{ argument['date'] }} by {{argument['author']}}</small>
   </div>
 </div>
 {% endif %}

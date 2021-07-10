@@ -26,7 +26,7 @@ Topics
     <a class="card-text" href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}">{{ issue['title']  }}</a>
   </div>
   <div class="card-footer">
-    <small class="text-muted"> Created on {{ issue['date'] }}</small>
+    <small class="text-muted"> Created on {{ issue['date'] }} by {{issue['author']}}</small>
   </div>
 </div>
 {% if not loop.last %}

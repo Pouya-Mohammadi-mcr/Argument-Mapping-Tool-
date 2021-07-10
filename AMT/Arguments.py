@@ -21,33 +21,43 @@ def createArgument():
     error = None   
     success = None
 
-    if request.method == 'GET':
-        rel = request.args.get('rel', None)
-        element = request.args.get('element', None)
-        if element:
-            element = int(element)
-            print(element)
+    rel = request.args.get('rel', None)
+    element = request.args.get('element', None)
+    if element:
+        element = int(element)
 
     if request.method == 'POST':
 
         argument = request.form['argument']
         elementID = request.form['elementID']
         relation = request.form['relation']
+        anonymous = request.form.get('anonymous')
 
         if not argument:
             error = "Your argument cannot be empty"
     
         if error == None:
             if elementID and relation:
-                result = Database().createArgumentAndRelation(g.user['username'],argument, elementID, relation)
-                if result == "ERROR":
-                    error= "The element you are referring to does not exist"
+                if anonymous:
+                    result = Database().createArgumentAndRelationAnonymous(g.user['username'],argument, elementID, relation)
+                    if result == "ERROR":
+                        error= "The element you are referring to does not exist"
+                    else:
+                        success = "Your argument and its relation are succesfully created"
                 else:
-                    success = "Your argument and its relation are succesfully created"
+                    result = Database().createArgumentAndRelation(g.user['username'],argument, elementID, relation)
+                    if result == "ERROR":
+                        error= "The element you are referring to does not exist"
+                    else:
+                        success = "Your argument and its relation are succesfully created"                    
             else:
-                result = Database().createArgument(g.user['username'],argument)
-                success = "Your argument is succesfully created"
-    
+                if anonymous:
+                    result = Database().createArgumentAnonymous(g.user['username'],argument)
+                    success = "Your argument is succesfully created without any relations"
+                else:
+                    result = Database().createArgument(g.user['username'],argument)
+                    success = "Your argument is succesfully created without any relations"
+
     return render_template('Arguments/CreateArgument.html', error=error, success=success, element=element, rel=rel)
 
 @bp.route("/createIssue", methods=('GET', 'POST'))
@@ -59,30 +69,36 @@ def createIssue():
     if request.method == 'POST':
 
         issue = request.form['issue']
+        anonymous = request.form.get('anonymous')
 
         if not issue:
             error = "Your issue cannot be empty"
     
         if error == None:
-            result = Database().createIssue(g.user['username'],issue)
+            if anonymous:
+                result = Database().createIssueAnonymous(g.user['username'],issue)
+            else:
+                result = Database().createIssue(g.user['username'],issue)
             success = "Your issue is succesfully created"
     
     return render_template('Arguments/CreateIssue.html', error=error, success=success)
 
-@bp.route("/createPosition/<int:issue>", methods=('GET', 'POST'))
 @bp.route("/createPosition", methods=('GET', 'POST'))
 @loginRequired
-def createPosition(issue = ""):
+def createPosition():
     error = None   
     success = None
 
-    if request.method == 'GET':
-        issue = issue
+    issue = request.args.get('issue', None)
+    if issue:
+        issue = int(issue)
 
-    elif request.method == 'POST':
+    if request.method == 'POST':
 
         position = request.form['position']
         issueID = request.form['issueID']
+        anonymous = request.form.get('anonymous')
+
 
         if not position:
             error = "Your position cannot be empty"
@@ -90,11 +106,18 @@ def createPosition(issue = ""):
             error = "You should specify the issue you are taking a position on"
     
         if error == None:
-            result = Database().createPosition(g.user['username'],position, issueID)
-            if result == "ERROR":
-                error= "The issue you are referring to does not exist"
+            if anonymous:
+                result = Database().createPositionAnonymous(g.user['username'],position, issueID)
+                if result == "ERROR":
+                    error= "The issue you are referring to does not exist"
+                else:
+                    success = "Your position is succesfully created"
             else:
-                success = "Your position is succesfully created"
+                result = Database().createPosition(g.user['username'],position, issueID)
+                if result == "ERROR":
+                    error= "The issue you are referring to does not exist"
+                else:
+                    success = "Your position is succesfully created"
     
     return render_template('Arguments/CreatePosition.html', error=error, success=success, issue=issue)
 

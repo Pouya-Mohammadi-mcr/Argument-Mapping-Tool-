@@ -19,8 +19,13 @@ Make an Argument
 
 <form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
 <label for="argument">Argument:</label><br>
-<textarea type="text" class="form-control" id="argument" name="argument" title="Enter Argument" placeholder="Enter your argument" required>{{ request.form['argument'] }}</textarea><br>
-
+<textarea type="text" class="form-control" id="argument" name="argument" title="Enter Argument" placeholder="Enter your argument" required>{{ request.form['argument'] }}</textarea>
+<div class="form-check my-3">
+  <input class="form-check-input" type="checkbox" name="anonymous" id="anonymous">
+  <label class="form-check-label" for="anonymous">
+    Create this argument anonymously
+  </label>
+</div>
 <p>
   <button class="btn btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
     + Connect to an element
@@ -31,7 +36,7 @@ Make an Argument
 
     <label for="elementID">Element ID:</label>
     {% if element != none %}
-      <input type="number" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter an element ID" value="{{ element }}" disabled><br>
+      <input type="number" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter an element ID" value="{{ element }}" readonly><br>
       <script>
       $(document).ready(function(){
       $(".collapse").collapse('show');
@@ -42,7 +47,7 @@ Make an Argument
     {% endif %}
     <label for="radioRow">Relation:</label>
     {% if rel %}
-    <input type="text" class="form-control" id="relation" name="relation" title="Enter the relation" placeholder="Enter the relation" value="{{ rel }}" disabled><br>
+    <input type="text" class="form-control" id="relation" name="relation" title="Enter the relation" placeholder="Enter the relation" value="{{ rel }}" readonly><br>
     {% else %}
     <div class="row px-3 pb-1" id="radioRow"> 
       <div class="form-check form-check-inline col">

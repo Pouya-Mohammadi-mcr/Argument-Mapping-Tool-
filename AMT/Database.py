@@ -108,7 +108,7 @@ class Database():
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "CREATE (a:Argument { title: $title, date: $date }) "
+            "CREATE (a:Argument { title: $title, date: $date, author: $username }) "
             "CREATE (u)-[:MADE]->(a) "
             "RETURN a"
         )
@@ -135,7 +135,7 @@ class Database():
             "MATCH (e) "
             "WHERE id(e) = $elementID "
 
-            "CREATE (a:Argument { title: $title, date: $date }) "
+            "CREATE (a:Argument { title: $title, date: $date, author: $username }) "
             "CREATE (u)-[:MADE]->(a) "
 
             "CREATE (r:Relation { title: $relation, date: $date }) "
@@ -147,7 +147,68 @@ class Database():
         )
         result = tx.run(query, title=title, username=username, elementID=int(elementID), relation=relation, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
-            relatedElements = ( [{"a": row["a"].id, "r": row["r"].id, "e": row["e"].id}
+            relatedElements = ( [{"a": row["a"].id, "author": row["a"]["author"], "r": row["r"].id, "e": row["e"].id}
+                    for row in result] )
+            if len(relatedElements) == 0:
+                return "ERROR"
+            else:
+                return relatedElements
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    def createArgumentAnonymous(self, username, title):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnArgumentAnonymous, username, title)
+            return result
+
+    @staticmethod
+    def createAndReturnArgumentAnonymous(tx, username, title):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "CREATE (a:Argument { title: $title, date: $date, author: 'Anonymous' }) "
+            "CREATE (u)-[:MADE]->(a) "
+            "RETURN a"
+        )
+        result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    def createArgumentAndRelationAnonymous(self, username, title, elementID, relation ):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnArgumentAndRelationAnonymous, username, title, elementID, relation)
+            return result
+
+    @staticmethod
+    def createAndReturnArgumentAndRelationAnonymous(tx, username, title, elementID, relation):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "MATCH (e) "
+            "WHERE id(e) = $elementID "
+
+            "CREATE (a:Argument { title: $title, date: $date, author: 'Anonymous' }) "
+            "CREATE (u)-[:MADE]->(a) "
+
+            "CREATE (r:Relation { title: $relation, date: $date }) "
+            "CREATE (u)-[:CREATED]->(r) "
+            "CREATE (r)-[:FROM]->(a) "
+            "CREATE (r)-[:TO]->(e) "
+
+            "RETURN a, r, e"
+        )
+        result = tx.run(query, title=title, username=username, elementID=int(elementID), relation=relation, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        try:
+            relatedElements = ( [{"a": row["a"].id, "author": row["a"]["author"], "r": row["r"].id, "e": row["e"].id}
                     for row in result] )
             if len(relatedElements) == 0:
                 return "ERROR"
@@ -169,13 +230,12 @@ class Database():
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "CREATE (i:Issue { title: $title, date: $date }) "
+            "CREATE (i:Issue { title: $title, date: $date, author: $username  }) "
             "CREATE (u)-[:RAISED]->(i) "
             "Return i"
         )
         #fix .encode 
         result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
-
         try:
             record = result.single()
             value = record.value()
@@ -185,6 +245,31 @@ class Database():
                 query=query, exception=exception))
             raise
 
+    def createIssueAnonymous(self, username, title):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnIssueAnonymous, username, title)
+            return result
+
+    @staticmethod
+    def createAndReturnIssueAnonymous(tx, username, title):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "CREATE (i:Issue { title: $title, date: $date, author: 'Anonymous' }) "
+            "CREATE (u)-[:RAISED]->(i) "
+            "Return i"
+        )
+        #fix .encode 
+        result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+    
     def createPosition(self, username, title, issueID):
         with self.driver.session(database=current_app.config['database']) as session:
             result = session.write_transaction(self.createAndReturnPosition, username, title, issueID)
@@ -198,7 +283,7 @@ class Database():
             "WHERE u.username = $username "
             "MATCH (i) "
             "WHERE id(i) = $issueID "
-            "CREATE (p:Position { title: $title, date: $date }) "
+            "CREATE (p:Position { title: $title, date: $date, author: $username }) "
             "CREATE (u)-[:TOOK]->(p) "
             "CREATE (p)-[:ANSWERS]->(i) "
             "RETURN i, p"
@@ -207,7 +292,40 @@ class Database():
         #fix .encode 
         result = tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
-            relatedElements = ( [{"i": row["i"].id, "p": row["p"].id}
+            relatedElements = ( [{"i": row["i"].id, "p": row["p"].id, "author": row["p"]["author"], }
+                    for row in result] )
+            if len(relatedElements) == 0:
+                return "ERROR"
+            else:
+                return relatedElements
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    def createPositionAnonymous(self, username, title, issueID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.createAndReturnPositionAnonymous, username, title, issueID)
+            return result
+
+    @staticmethod
+    def createAndReturnPositionAnonymous(tx, username, title, issueID):
+        #Does not check if the issueID is actually an ID for an ISSUE
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "MATCH (i) "
+            "WHERE id(i) = $issueID "
+            "CREATE (p:Position { title: $title, date: $date, author:'Anonymous' }) "
+            "CREATE (u)-[:TOOK]->(p) "
+            "CREATE (p)-[:ANSWERS]->(i) "
+            "RETURN i, p"
+
+        )
+        #fix .encode 
+        result = tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
+        try:
+            relatedElements = ( [{"i": row["i"].id, "p": row["p"].id, "author": row["p"]["author"],}
                     for row in result] )
             if len(relatedElements) == 0:
                 return "ERROR"
@@ -336,7 +454,7 @@ class Database():
         )
         result = tx.run(query, issueID=issueID)
         try:
-            foundPositions = ( [{"title": row["p"]["title"], "id": row["p"].id, "date": row["p"]["date"]}
+            foundPositions = ( [{"title": row["p"]["title"], "id": row["p"].id, "date": row["p"]["date"], "author": row["p"]["author"]}
                     for row in result] )
             if len(foundPositions) == 0:
                 return "ERROR"
@@ -395,7 +513,7 @@ class Database():
         )
         result = tx.run(query, elementID=elementID)
         try:
-            arguments = ( [{"relation": row['r.title'], "relationID": row['id(r)'], "title": row["a"]["title"], "id": row["a"].id, "date": row["a"]["date"]}
+            arguments = ( [{"relation": row['r.title'], "relationID": row['id(r)'], "title": row["a"]["title"], "id": row["a"].id, "date": row["a"]["date"], "author": row["a"]["author"]}
                     for row in result] )
             if len(arguments) == 0:
                 return "ERROR"

@@ -13,10 +13,10 @@
     <title>{% block title %}{% endblock %} - AMT</title>
     {% endblock %}
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background-color: #e3f2fd;">
+  <body style="background-color: #F8FBF8;" >
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background-color: #376E70;">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/"><i class="fas fa-project-diagram"></i></a>
+        <a class="navbar-brand" href="/"><i class="fas fa-project-diagram" style="color: #DB7A93;"></i></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -24,31 +24,31 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             {% if g.user %}
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   {{ g.user['username'] }}
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="{{ url_for('Auth.signOut') }}">Log Out</a></li>
+                  <li><a class="dropdown-item" style="color: #376E70;" href="{{ url_for('Auth.signOut') }}">Log Out</a></li>
                 </ul>
               </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Create
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="/createIssue">Topic</a></li>
-                  <li><a class="dropdown-item" href="/createPosition">Position</a></li>
-                  <li><a class="dropdown-item" href="/createArgument">Argument</a></li>
+                  <li><a class="dropdown-item" style="color: #376E70;" href="/createIssue">Topic</a></li>
+                  <li><a class="dropdown-item" style="color: #376E70;" href="/createPosition">Position</a></li>
+                  <li><a class="dropdown-item" style="color: #376E70;" href="/createArgument">Argument</a></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="/createRelation">Relation</a></li>
+                  <li><a class="dropdown-item" style="color: #376E70;" href="/createRelation">Relation</a></li>
                 </ul>
               </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url_for('Auth.signUp') }}">Register</a>
+            <a class="nav-link text-light" aria-current="page" href="{{ url_for('Auth.signUp') }}">Register</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url_for('Auth.signIn') }}">Log In</a>
+            <a class="nav-link text-light" aria-current="page" href="{{ url_for('Auth.signIn') }}">Log In</a>
           </li>
           <li class="nav-item dropdown ">
             <a class="nav-link dropdown-toggle disabled" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -66,13 +66,13 @@
           </ul>
           <form class="d-flex" action="{{ url_for('Arguments.findElement') }}" method="post">
             <input class="form-control me-2" type="number" name="elementID" id="elementID" placeholder="Find element by ID " aria-label="Search" value="{{ request.form['elementID'] }}" required>
-            <button class="btn btn-outline-primary" type="submit">Find</button>
+            <button class="btn btn-outline-light"  type="submit">Find</button>
           </form>
         </div>
       </div>
     </nav>
-    <div class="container my-2" id="content">
-    <div class="h3 text-center d-flex justify-content-center">
+    <div class="container my-2" id="content" >
+    <div class="h3 text-center d-flex justify-content-center my-3"  >
       {% block header %}{% endblock %}
     </div>
       {% block content %}{% endblock %}
@@ -81,7 +81,7 @@
       {% block footer %}
       {% endblock %}
     </div>
-    <nav class="navbar fixed-bottom navbar-light" style="background-color: #e3f2fd;">
+    <nav class="navbar fixed-bottom navbar-light" style="background-color: #376E70;">
       <div class="container-fluid">
       </div>
     </nav>

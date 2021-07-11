@@ -1,51 +1,51 @@
 {% extends "layout.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Show Positions{% endblock %}
 {% block head %}
   {{ super() }}
 {% endblock %}
 {% block header %}
 
-<div class="card" style="width: 22rem;">
-  <div class="card-header bg-light">
+<div class="card" style="width: 22rem; border-color: #376E70;">
+  <div class="card-header text-light" style="background-color: #376E70;" >
     Topic
   </div>
   <div class="card-body">
-    <h5 class="card-title">{{issue['title']}}</h5>
-    <a href="{{ url_for('Arguments.createPosition', issue = issue.id ) }}" class="btn btn-outline-primary">Take a new position</a>
+    <h5 class="card-title text-dark">{{issue['title']}}</h5>
+    <a href="{{ url_for('Arguments.createPosition', issue = issue.id ) }}" class="btn text-light" style="background-color: #376E70;">Take a new position</a>
   </div>
 </div>
 
 {% endblock %}
 {% block content %}
 {% if error %}
-<div class="alert alert-danger" role="alert">
+<div class="alert text-light" role="alert" style="background-color: #DB7A93;">
     {{ error }}!
   </div>
 {% else %}
 
-<p class="h3 text-primary">Positions made:</p>
+<p class="h4" ><span style="color: #DB7A93;">Position(s)</span>  taken on this Topic:</p>
 {% for position in positions %}
-<div class="card">
-  <div class="card-header" style="height: 3.2rem;">
+<div class="card" style="border-color: #DB7A93;">
+  <div class="card-header bg-transparent" style="height: 3.2rem; border-color: #DB7A93;">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text bg-transparent border-0">Position ID:</span>
       </div>
       <input type="text" class="form-control bg-transparent border-0" id="{{ position['id'] }}" value='{{ position["id"] }}' readonly>
       <div class="input-group-append">
-        <button type="button" class="btn btn-sm btn-outline-primary" onclick=copyToClipboard({{ position['id']|safe }});>Copy ID</button>
+        <button type="button" class="btn btn-sm" style="border: 1px solid #DB7A93;" onclick=copyToClipboard({{ position['id']|safe }});>Copy ID</button>
       </div>
     </div>
   </div>
-    <div class="card-body">
-    <a href="{{ url_for('Arguments.showArguments', elementID = position['id'] ) }}" class="card-text">{{ position['title']  }}</a>
+    <div class="card-body" style="background-color: #DB7A93;">
+    <a href="{{ url_for('Arguments.showArguments', elementID = position['id'] ) }}" class="card-text text-light">{{ position['title']  }}</a>
   </div>
-  <div class="card-footer">
+  <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
     <small class="text-muted"> Created on {{ position['date'] }} by {{position['author']}}</small>
   </div>
 </div>
 {% if not loop.last %}
-  <hr>
+  <hr style="color: #376E70; height: 1pt;">
 {% endif %}
 {% endfor %}
 

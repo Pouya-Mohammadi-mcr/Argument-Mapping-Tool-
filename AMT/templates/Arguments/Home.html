@@ -10,27 +10,27 @@ Topics
 {% block content %}
 
 {% for issue in issues %}
-<div class="card">
-  <div class="card-header" style="height: 3.2rem;">
+<div class="card" style="border-color: #DB7A93;">
+  <div class="card-header bg-transparent" style="height: 3.2rem; border-color: #DB7A93;" >
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text bg-transparent border-0">Topic ID:</span>
       </div>
       <input type="text" class="form-control bg-transparent border-0" id="{{ issue.id }}" value='{{ issue.id }}' readonly>
       <div class="input-group-append">
-        <button type="button" class="btn btn-sm btn-outline-primary" onclick=copyToClipboard({{ issue.id|safe }});>Copy ID</button>
+        <button type="button" class="btn btn-sm" style="border: 1px solid #DB7A93;" onclick=copyToClipboard({{ issue.id|safe }});>Copy ID</button>
       </div>
     </div>
   </div>
-    <div class="card-body">
-    <a class="card-text" href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}">{{ issue['title']  }}</a>
+    <div class="card-body" style="background-color: #DB7A93;">
+    <a class="card-text text-light" href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}">{{ issue['title']  }}</a>
   </div>
-  <div class="card-footer">
+  <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
     <small class="text-muted"> Created on {{ issue['date'] }} by {{issue['author']}}</small>
   </div>
 </div>
 {% if not loop.last %}
-  <hr>
+  <hr style="color: #376E70; height: 1pt;">
 {% endif %}
 {% endfor %}
 

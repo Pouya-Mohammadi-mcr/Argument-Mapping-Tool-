@@ -29,3 +29,15 @@ function copyToClipboard(id) {
     /* Alert the copied text */
     alert("Copied ID: " + copyText.value + " to clipboard");
   }
+
+
+var myModal = document.getElementById('myModal')
+var myInput = document.getElementById('myInput')
+
+myModal.addEventListener('shown.bs.modal', function () {
+  myInput.focus()
+})
+
+
+
+

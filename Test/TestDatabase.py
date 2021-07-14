@@ -174,13 +174,39 @@ class TestDatabase(unittest.TestCase):
             self.assertEqual(arguments[0]['title'],"X is a popular company.", "The first supporting argument's title was not returned correctly")
             self.assertEqual(arguments[1]['relation'],"Opposes", "The second argument's relation was not returned correctly")
             self.assertEqual(arguments[1]['title'],"This will encourage arms production.", "The opposing argument's title was not returned correctly")
-            self.assertEqual(arguments[2]['relation'],"Asks a question", "The third argument's relation was not returned correctly")
-            self.assertEqual(arguments[2]['title'],"Does it mean it should be able to sponsor any conference? or some specific ones?", "The custom argument's title was not returned correctly")
- 
-#            print(arguments)
-#            self.assertEqual(opposingArgs[0]['title'],"This will encourage arms production.", "The first opposing argument's title was not returned correctly")
-#            self.assertEqual(otherArgs[0]['title'],"Does it mean it should be able to sponsor any conference? or some specific ones?")
-#            self.assertEqual(otherArgs[0]['type'],"Asks a question")
-# , opposingArgs, otherArgs 
+            self.assertEqual(arguments[3]['relation'],"Asks a question", "The third argument's relation was not returned correctly")
+            self.assertEqual(arguments[3]['title'],"Does it mean it should be able to sponsor any conference? or some specific ones?", "The custom argument's title was not returned correctly")
+
+    def testRate(self):
+        with self.app.app_context():
+            issue = self.db.createIssue("Pouya","some text for the test issue for rating")
+            elementAndRelation = self.db.rate("Pouya", issue.id, 5)
+            rate = elementAndRelation[0]['rate']
+            rateSum = elementAndRelation[0]['rateSum']
+            ratesNo = elementAndRelation[0]['ratesNo']
+        self.assertEqual(rate, 5,"The new rating was not returned correctly")
+        self.assertEqual(rateSum, 5,"The sum of ratings was not returned correctly")
+        self.assertEqual(ratesNo, 1,"The total number of rates was not returned correctly")
+        
+        with self.app.app_context():
+            elementAndRelation = self.db.rate("Jack", issue.id, 4)
+            rate = elementAndRelation[0]['rate']
+            rateSum = elementAndRelation[0]['rateSum']
+            ratesNo = elementAndRelation[0]['ratesNo']
+        self.assertEqual(rate, 4,"The new rating was not returned correctly")
+        self.assertEqual(rateSum, 9,"The sum of ratings was not returned correctly")
+        self.assertEqual(ratesNo, 2,"The total number of rates was not returned correctly")
+        
+        with self.app.app_context():
+            elementAndRelation = self.db.rate("Pouya", issue.id, 3)
+            rate = elementAndRelation[0]['rate']
+            rateSum = elementAndRelation[0]['rateSum']
+            ratesNo = elementAndRelation[0]['ratesNo']
+            #delete the issue created
+            self.db.deleteElement(issue.id)
+        self.assertEqual(rate, 3,"The new rating was not returned correctly")
+        self.assertEqual(rateSum, 7,"The sum of ratings was not returned correctly")
+        self.assertEqual(ratesNo, 2,"The total number of rates was not returned correctly")
+
 if __name__ == '__main__':
     unittest.main()

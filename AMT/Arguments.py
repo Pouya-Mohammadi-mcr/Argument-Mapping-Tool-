@@ -1,6 +1,6 @@
 from os import error
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
 from werkzeug.exceptions import abort
 
@@ -173,6 +173,7 @@ def findElement():
 
 @bp.route("/showPositions/<int:issueID>")
 def showPositions(issueID):
+    session['url'] = url_for('Arguments.showPositions', issueID = issueID)
     error = None
     positions = Database().getPositions(issueID)
     if positions == "ERROR":
@@ -182,9 +183,26 @@ def showPositions(issueID):
 
 @bp.route("/showArguments/<int:elementID>")
 def showArguments(elementID):
+    session['url'] = url_for('Arguments.showArguments', elementID = elementID)
     error = None
     arguments = Database().getArguments(elementID)
     if arguments == "ERROR":
         error = "No arguments have been made on this element"
     element = Database().getSingleElement(elementID)
     return render_template('Arguments/ShowArguments.html', arguments=arguments, element=element, error=error)
+
+@bp.route("/rate", methods=('GET', 'POST'))
+@loginRequired
+def rate():
+
+    if request.method == 'POST':
+
+        elementID = int(request.form['elementID'])    
+        rate = request.form.get('rate')
+        if rate:
+            rate = int(rate)
+            result = Database().rate(g.user['username'], elementID, rate)
+
+    if 'url' in session:
+        return redirect(session['url'])
+    return render_template('Arguments/StarRating.html')

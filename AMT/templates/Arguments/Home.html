@@ -17,7 +17,17 @@ Topics
         <span class="input-group-text bg-transparent border-0">Topic ID:</span>
       </div>
       <input type="text" class="form-control bg-transparent border-0" id="{{ issue.id }}" value='{{ issue.id }}' readonly>
-      <div class="input-group-append">
+
+      {% if issue['rateSum'] %}
+      <i class="far fa-star mt-2" style="color:#FFC700 ;"></i>
+      <input type="text" class="form-control bg-transparent border-0"  value="{{ ['%0.2f'| format(issue['rateSum']/issue['ratesNo']|float), '/', 5, ' ','(', issue['ratesNo'], ')']|join}}" readonly>
+      {%endif%}
+
+      <div class="input-group-prepend">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+
+      <div class="input-group-append ">
         <button type="button" class="btn btn-sm" style="border: 1px solid #DB7A93;" onclick=copyToClipboard({{ issue.id|safe }});>Copy ID</button>
       </div>
     </div>
@@ -33,5 +43,4 @@ Topics
   <hr style="color: #376E70; height: 1pt;">
 {% endif %}
 {% endfor %}
-
 {% endblock %}

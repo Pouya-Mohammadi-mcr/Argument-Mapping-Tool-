@@ -23,9 +23,9 @@ def signUp():
             error = "Username already exists"
         else:
             session['username'] = username
-            flash('logged in')
-            return redirect(url_for('Auth.signIn'))
-        flash(error)
+            if 'url' in session:
+                return redirect(session['url'])
+            return redirect(url_for('Arguments.index'))
 
     return render_template('Auth/SignUp.html', error=error)
     
@@ -47,11 +47,10 @@ def signIn():
             error = 'Incorrect password'
 
         if error is None:
-            session.clear()
             session['username'] = username
-            return redirect(url_for('Auth.signIn'))
-
-        flash(error)
+            if 'url' in session:
+                return redirect(session['url'])
+            return redirect(url_for('Arguments.index'))
 
     return render_template('Auth/SignIn.html', error=error)
 

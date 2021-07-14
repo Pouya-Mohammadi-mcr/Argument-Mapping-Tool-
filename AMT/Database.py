@@ -41,7 +41,9 @@ class Database():
     def findAndReturnIssues(tx):
         query = (
             "MATCH (i:Issue) "
-            "RETURN i"
+            "RETURN i "
+            "ORDER BY -i.rateSum/i.ratesNo"
+
         )
         issues = tx.run(query)
         try:
@@ -450,11 +452,11 @@ class Database():
             "WHERE id(i) = $issueID "
             "MATCH (i)<-[:ANSWERS]-(p:Position) "
             "RETURN p "
-            "ORDER BY id(p)"
+            "ORDER BY -p.rateSum/p.ratesNo"
         )
         result = tx.run(query, issueID=issueID)
         try:
-            foundPositions = ( [{"title": row["p"]["title"], "id": row["p"].id, "date": row["p"]["date"], "author": row["p"]["author"]}
+            foundPositions = ( [{"title": row["p"]["title"], "id": row["p"].id, "date": row["p"]["date"], "author": row["p"]["author"], "rateSum": row["p"]["rateSum"], "ratesNo": row["p"]["ratesNo"]}
                     for row in result] )
             if len(foundPositions) == 0:
                 return "ERROR"
@@ -508,17 +510,54 @@ class Database():
             "WITH (r)"
             "MATCH (a:Argument)<-[:FROM]-(r:Relation) "
             "RETURN a, r.title, id(r) "
-            "ORDER BY id(a)"
+            "ORDER BY -a.rateSum/a.ratesNo"
 
         )
         result = tx.run(query, elementID=elementID)
         try:
-            arguments = ( [{"relation": row['r.title'], "relationID": row['id(r)'], "title": row["a"]["title"], "id": row["a"].id, "date": row["a"]["date"], "author": row["a"]["author"]}
+            arguments = ( [{"relation": row['r.title'], "relationID": row['id(r)'], "title": row["a"]["title"], "id": row["a"].id, "date": row["a"]["date"], "author": row["a"]["author"], "rateSum": row["a"]["rateSum"], "ratesNo": row["a"]["ratesNo"]}
                     for row in result] )
             if len(arguments) == 0:
                 return "ERROR"
             else:
                 return arguments
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+
+    def rate(self, username, elementID, rating):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.write_transaction(self.rateAndReturn, username, elementID, rating)
+            return result
+
+    @staticmethod
+    def rateAndReturn(tx, username, elementID, rating):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "MATCH (e) "
+            "WHERE id(e) = $elementID "
+            "SET e.ratesNo = "
+            "CASE WHEN e.ratesNo IS NULL THEN 1 ELSE e.ratesNo+1 END "
+            "SET e.rateSum = "
+            "CASE WHEN e.rateSum IS NULL THEN $rating ELSE e.rateSum+$rating END "
+            "MERGE (u)-[r:RATED]->(e) ON CREATE SET r.rate=$rating ON MATCH SET e.rateSum=e.rateSum-r.rate, e.ratesNo=e.ratesNo-1, r.rate=$rating "
+
+            "RETURN e.ratesNo, e.rateSum, r.rate"
+
+        )
+        #fix .encode 
+        result = tx.run(query, username=username, elementID=int(elementID), rating=int(rating))
+        try:
+            foundNodes = ( [{"ratesNo": row["e.ratesNo"], "rateSum": row["e.rateSum"], "rate": row["r.rate"]}
+                    for row in result] )
+            if len(foundNodes) == 0:
+                return "ERROR"
+            else:
+                return foundNodes
         # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(

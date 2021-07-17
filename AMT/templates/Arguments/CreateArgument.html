@@ -13,7 +13,11 @@ Make an Argument
   </div>
 {% elif success %}
 <div class="alert alert-success" role="alert">
-    {{ success }}!
+  <form action="{{ url_for('Arguments.findElement') }}" method="post">
+      {{ success }}! 
+      <input class="form-control me-2" type="hidden" name="elementID" id="elementID" placeholder="Find element by ID " aria-label="Search" value="{{argumentID}}" required>
+      <button class="btn btn-sm text-light" style="background-color: #DB7A93;" type="submit"> ID: {{argumentID}}</button>
+    </form>
   </div>
 {% endif %}
 
@@ -43,7 +47,7 @@ Make an Argument
       });
       </script>
     {% else %}
-    <input type="number" class="form-control" id="elementID" name="elementID" title="Enter an element ID" placeholder="Enter the element ID" value="{{ request.form['elementID'] }}" ><br>
+    <input type="number" class="form-control" id="elementID" name="elementID" data-toggle="tooltip"  title="Can be a position or argument or relation ID" placeholder="Enter the element ID" value="{{ request.form['elementID'] }}" ><br>
     {% endif %}
     <label for="radioRow">Relation:</label>
     {% if rel %}

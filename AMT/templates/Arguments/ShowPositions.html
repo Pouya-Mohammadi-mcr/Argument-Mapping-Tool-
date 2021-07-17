@@ -25,11 +25,18 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
+        {% if userRate %}
+        <h5 class="modal-title" id="exampleModalLabel">Your rating: {% for i in range(userRate) %} <i class="far fa-star mt-2" style="color:#FFC700 ;"></i> {% endfor %}</h5>
+        {% else %}
         <h5 class="modal-title" id="exampleModalLabel">Rate this element</h5>
+        {% endif %}
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form class="rate" action="{{url_for('Arguments.rate')}}" method="POST">
+          {% if userRate %}
+          <span class="fs-4" style="color: #DB7A93;">Change your rating:&nbsp; </span>
+          {% endif %}
           <input type="radio" id="star5" name="rate" value="5" />
           <label for="star5" title="text">5 stars</label>
           <input type="radio" id="star4" name="rate" value="4" />

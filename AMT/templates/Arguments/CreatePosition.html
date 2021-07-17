@@ -13,7 +13,11 @@ Take a Position
   </div>
 {% elif success %}
 <div class="alert alert-success" role="alert">
-    {{ success }}!
+  <form action="{{ url_for('Arguments.findElement') }}" method="post">
+      {{ success }}! 
+      <input class="form-control me-2" type="hidden" name="elementID" id="elementID" placeholder="Find element by ID " aria-label="Search" value="{{positionID}}" required>
+      <button class="btn btn-sm text-light" style="background-color: #DB7A93;" type="submit"> ID: {{positionID}}</button>
+    </form>
   </div>
 {% endif %}
 
@@ -21,7 +25,7 @@ Take a Position
 <form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
 <label for="position">Position:</label><br>
 <input type="text" class="form-control" id="position" name="position" title="Enter a position" placeholder="Enter a position" value="{{ request.form['position'] }}" required><br>
-<label for="issueID">issue ID:</label><br>
+<label for="issueID">Topic ID:</label><br>
 {% if issue %}
 <input type="number" class="form-control" id="issueID" name="issueID" title="Enter an issueID" placeholder="Enter an issueID" value="{{ issue }}" required>
 <script>

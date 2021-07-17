@@ -208,5 +208,15 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(rateSum, 7,"The sum of ratings was not returned correctly")
         self.assertEqual(ratesNo, 2,"The total number of rates was not returned correctly")
 
+    def testGetUserRate(self):
+        with self.app.app_context():
+            ratedRelation = self.db.getUserRate("Pouya",2)
+            userRate = ratedRelation['rate']
+            nullRatedRelation = self.db.getUserRate("Pouya",4)
+
+        self.assertEqual(userRate, 5,"The user rate was not returned correctly")
+        self.assertEqual(nullRatedRelation, "ERROR", "The non existent user rate was not returned correctly")
+
+
 if __name__ == '__main__':
     unittest.main()

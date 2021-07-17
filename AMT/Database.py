@@ -134,8 +134,10 @@ class Database():
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
+
+            "WITH ['Issue'] AS issue, ['User'] AS user " 
             "MATCH (e) "
-            "WHERE id(e) = $elementID "
+            "WHERE id(e) = $elementID AND labels(e)<>issue AND labels(e)<>user "
 
             "CREATE (a:Argument { title: $title, date: $date, author: $username }) "
             "CREATE (u)-[:MADE]->(a) "
@@ -195,8 +197,10 @@ class Database():
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
+
+            "WITH ['Issue'] AS issue, ['User'] AS user "     
             "MATCH (e) "
-            "WHERE id(e) = $elementID "
+            "WHERE id(e) = $elementID AND labels(e)<>issue AND labels(e)<>user "
 
             "CREATE (a:Argument { title: $title, date: $date, author: 'Anonymous' }) "
             "CREATE (u)-[:MADE]->(a) "
@@ -283,7 +287,7 @@ class Database():
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "MATCH (i) "
+            "MATCH (i:Issue) "
             "WHERE id(i) = $issueID "
             "CREATE (p:Position { title: $title, date: $date, author: $username }) "
             "CREATE (u)-[:TOOK]->(p) "
@@ -316,7 +320,7 @@ class Database():
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "MATCH (i) "
+            "MATCH (i:Issue) "
             "WHERE id(i) = $issueID "
             "CREATE (p:Position { title: $title, date: $date, author:'Anonymous' }) "
             "CREATE (u)-[:TOOK]->(p) "
@@ -559,6 +563,36 @@ class Database():
             else:
                 return foundNodes
         # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    def getUserRate(self, username, elementID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.findAndReturnUserRate, username, elementID)
+            return result
+
+    @staticmethod
+    def findAndReturnUserRate(tx, username, elementID):
+        query = (
+            "MATCH (e) "
+            "WHERE id(e) = $elementID "
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "MATCH (u)-[r:RATED]->(e)"
+            "Return r"
+        )
+        #fix .encode 
+        result = tx.run(query, username=username, elementID=int(elementID))
+
+        try:
+            record = result.single()
+            if record:
+                value = record.value()
+            else:
+                value = "ERROR"
+            return value
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))

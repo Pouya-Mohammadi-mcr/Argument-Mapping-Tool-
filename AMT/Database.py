@@ -45,9 +45,13 @@ class Database():
             "ORDER BY -i.rateSum/i.ratesNo"
 
         )
-        issues = tx.run(query)
+        result = tx.run(query)
         try:
-            return [row["i"] for row in issues]
+            issues= [row["i"] for row in result]
+            if len(issues)>0:
+                return issues
+            else:
+                return "ERROR"            
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -597,3 +601,34 @@ class Database():
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
             raise
+
+    def search(self, searchPhrase):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.searchAndReturn, searchPhrase)
+            return result
+
+    @staticmethod
+    def searchAndReturn(tx, searchPhrase):
+        query = (
+
+            "WITH ['Issue'] AS issue, ['Argument'] AS argument, ['Position'] AS position "     
+            "MATCH (e) "
+            "WHERE (labels(e)=issue OR labels(e)=argument OR labels(e)=position) AND toLower(e.title) CONTAINS toLower($searchPhrase) "
+            "RETURN e "
+            "ORDER BY -e.rateSum/e.ratesNo"
+
+        )
+        result = tx.run(query, searchPhrase=searchPhrase)
+        try:
+            matches = [row["e"] for row in result]
+            if len(matches)>0:
+                return matches
+            else:
+                return "ERROR"
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise    
+
+
+

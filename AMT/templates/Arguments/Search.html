@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+{% block title %}Search{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block header %}
+Search
+{% endblock %}
+{% block content %}
+<form name="input" method="POST" data-ajax="false" onSubmit="validateForm(this)">
+    <div class="input-group mb-3"> 
+    <input type="text" class="form-control" id="searchPhrase" name="searchPhrase" title="Enter your search phrase" required><br>
+    <input type="submit" value="Search" class="btn text-light" style="background-color: #376E70;">
+    </div>
+</form>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}!
+  </div>
+  {% elif searchResults %}
+
+{% for element in searchResults %}
+
+
+  {% set elementLabel = []%}
+{% for label in element.labels %}
+  {% if label == 'Issue' %}
+  {{ elementLabel.append('Topic') or "" }}
+  {% else %}
+  {{ elementLabel.append(label) or "" }}
+  {% endif %}
+
+{% endfor %}
+
+
+
+<div class="card" style="border-color: #DB7A93;">
+  <div class="card-header bg-transparent" style="height: 3.2rem; border-color: #DB7A93;" >
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text bg-transparent border-0">{{elementLabel[0]}} ID:</span>
+      </div>
+      <input type="text" class="form-control bg-transparent border-0" id="{{ element.id }}" value='{{ element.id }}' readonly>
+
+      {% if element['rateSum'] %}
+      <i class="far fa-star mt-2" style="color:#FFC700 ;"></i>
+      <input type="text" class="form-control bg-transparent border-0"  value="{{ ['%0.2f'| format(element['rateSum']/element['ratesNo']|float), '/', 5, ' ','(', element['ratesNo'], ')']|join}}" readonly>
+      {%endif%}
+
+      <div class="input-group-prepend">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+
+      <div class="input-group-append ">
+        <button type="button" class="btn btn-sm" style="border: 1px solid #DB7A93;" onclick=copyToClipboard({{ element.id|safe }});>Copy ID</button>
+      </div>
+    </div>
+  </div>
+    <div class="card-body" style="background-color: #DB7A93;">
+    {% if elementLabel[0]=='Topic' %}
+    <a class="card-text text-light" href="{{ url_for('Arguments.showPositions',issueID = element.id) }}">{{ element['title']  }}</a>
+    {% else %}
+    <a href="{{ url_for('Arguments.showArguments', elementID = element.id ) }}" class="card-text text-light">{{ element['title']  }}</a>
+    {% endif %}
+  </div>
+  <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
+    <small class="text-muted"> Created on {{ element['date'] }} by {{element['author']}}</small>
+  </div>
+</div>
+{% if not loop.last %}
+  <hr style="color: #376E70; height: 1pt;">
+{% endif %}
+
+
+{% endfor %}
+
+
+
+
+
+
+{% endif %}
+{% endblock %}

@@ -9,6 +9,11 @@ Topics
 {% endblock %}
 {% block content %}
 
+{% if error %}
+<div class="alert text-light" role="alert" style="background-color: #DB7A93;">
+    {{ error }}!
+  </div>
+{% else %}
 {% for issue in issues %}
 <div class="card" style="border-color: #DB7A93;">
   <div class="card-header bg-transparent" style="height: 3.2rem; border-color: #DB7A93;" >
@@ -43,4 +48,5 @@ Topics
   <hr style="color: #376E70; height: 1pt;">
 {% endif %}
 {% endfor %}
+{% endif %}
 {% endblock %}

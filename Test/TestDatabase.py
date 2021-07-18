@@ -61,7 +61,7 @@ class TestDatabase(unittest.TestCase):
             relatedElementID = relatedElements[0]['e']
             argumentAuthor = relatedElements[0]['author']
 
-            #delete the argument created
+            #delete the argument and relation created
             self.db.deleteElement(argID)
             self.db.deleteElement(relationID)
 
@@ -85,7 +85,7 @@ class TestDatabase(unittest.TestCase):
             relatedElementID = relatedElements[0]['e']
             argumentAuthor = relatedElements[0]['author']
 
-            #delete the argument created
+            #delete the argument and relation created
             self.db.deleteElement(argID)
             self.db.deleteElement(relationID)
 
@@ -217,6 +217,22 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(userRate, 5,"The user rate was not returned correctly")
         self.assertEqual(nullRatedRelation, "ERROR", "The non existent user rate was not returned correctly")
 
+    def testSearch(self):
+        with self.app.app_context():
+            searchResults = self.db.search("X")
+            node1 = searchResults[0]['title']
+            node2 = searchResults[1].id
+            node3 = searchResults[2].id
+            node4 = searchResults[3].id
+
+            searchResults2 = self.db.search("somewierdtext asada asdasd ")
+            
+        self.assertEqual(searchResults2, "ERROR","The empty search results not returned correctly")
+
+        self.assertEqual(node1, "X is a popular company.","The title for the first matched node was not returned correctly")
+        self.assertEqual(node2, 1, "The id for the second matched node was not returned correctly")
+        self.assertEqual(node3, 7, "The id for the third matched node was not returned correctly")
+        self.assertEqual(node4, 20, "The id for the fourth matched node was not returned correctly")
 
 if __name__ == '__main__':
     unittest.main()

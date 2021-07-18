@@ -8,6 +8,9 @@
 <div class="card" style="width: 22rem; border-color: #376E70;">
   <div class="card-header text-light" style="background-color: #376E70;" >
     Topic
+    {% if issue['rateSum'] %}
+    <i class="far fa-star fs-6 d-flex justify-content-center" style="color:#FFC700 ;"> {{ ['%0.2f'| format(issue['rateSum']/issue['ratesNo']|float), '/', 5, ' ','(', issue['ratesNo'], ')']|join}}</i>
+  {% endif %}
   </div>
   <div class="card-body">
     <h5 class="card-title text-dark">{{issue['title']}}</h5>

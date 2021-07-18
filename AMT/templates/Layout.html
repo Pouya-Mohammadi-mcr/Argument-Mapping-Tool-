@@ -63,6 +63,9 @@
             </ul>
           </li>
           {% endif %}
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{ url_for('Arguments.search') }}">Search</a>
+          </li>
           </ul>
           <form class="d-flex" action="{{ url_for('Arguments.findElement') }}" method="post">
             <input class="form-control me-2" type="number" name="elementID" id="elementID" placeholder="Find element by ID " aria-label="Search" value="{{ request.form['elementID'] }}" required>

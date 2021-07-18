@@ -12,8 +12,11 @@ bp = Blueprint('Arguments', __name__)
 
 @bp.route('/')
 def index():
+    error = None
     issues = Database().findIssues()
-    return render_template('Arguments/Home.html', issues=issues)
+    if issues=="ERROR":
+        error="No topics found"
+    return render_template('Arguments/Home.html', issues=issues, error=error)
 
 @bp.route("/createArgument", methods=('GET', 'POST'))
 @loginRequired
@@ -235,3 +238,21 @@ def rate():
     if 'url' in session:
         return redirect(session['url'])
     return render_template('Arguments/StarRating.html')
+
+
+@bp.route('/search',  methods=('GET', 'POST'))
+def search():
+    error = None
+    searchResults = None
+
+    if request.method == 'POST':
+        searchPhrase = request.form['searchPhrase']
+
+        if not searchPhrase:
+            error = 'Search phrase is required'
+        else:
+            searchResults = Database().search(searchPhrase)
+            if searchResults == "ERROR":
+                error = "No matches found"
+
+    return render_template('Arguments/Search.html', error=error, searchResults=searchResults)

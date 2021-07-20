@@ -557,7 +557,6 @@ class Database():
             "RETURN e.ratesNo, e.rateSum, r.rate"
 
         )
-        #fix .encode 
         result = tx.run(query, username=username, elementID=int(elementID), rating=int(rating))
         try:
             foundNodes = ( [{"ratesNo": row["e.ratesNo"], "rateSum": row["e.rateSum"], "rate": row["r.rate"]}
@@ -584,10 +583,9 @@ class Database():
             "WHERE id(e) = $elementID "
             "MATCH (u:User) "
             "WHERE u.username = $username "
-            "MATCH (u)-[r:RATED]->(e)"
+            "MATCH (u)-[r:RATED]->(e) "
             "Return r"
         )
-        #fix .encode 
         result = tx.run(query, username=username, elementID=int(elementID))
 
         try:
@@ -632,3 +630,32 @@ class Database():
 
 
 
+    def getUserReputation(self, username):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.findAndReturnUserReputation, username)
+            return result
+
+    @staticmethod
+    def findAndReturnUserReputation(tx, username):
+        query = (
+            "MATCH (u:User) "
+            "WHERE u.username = $username "
+            "MATCH (u)-[:RAISED|:TOOK|:MADE|:CREATED]->(e) "
+            "WHERE e.rateSum IS NOT NULL "
+
+            "RETURN CASE count(e.rateSum) WHEN 0 THEN 'No ratings avaialable'  ELSE 'Reputation: '+toString(round(toFloat(sum(e.rateSum/e.ratesNo))/count(e.rateSum),2))+'/5, number of rated contributions: '+toString(count(e.rateSum)) end"
+        )
+
+        result = tx.run(query, username=username)
+
+        try:
+            record = result.single()
+            if record:
+                value = record.value()
+            else:
+                value = "ERROR"
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise

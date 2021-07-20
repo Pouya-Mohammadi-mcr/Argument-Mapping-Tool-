@@ -170,7 +170,10 @@
     <a href="{{ url_for('Arguments.showArguments', elementID = argument['id'] ) }}" class="card-text text-light">{{ argument['title']  }}</a>
   </div>
   <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
-    <small class="text-muted"> Created on {{ argument['date'] }} by {{argument['author']}}</small>
+    <small class="text-muted"> Created on {{ argument['date'] }} by {{argument['author']}}
+      <i class="far fa-star mt-2" style="color:#376E70 ;"></i>
+      <a style="color: #376E70" authorUsername="{{argument['author']}}" class='getRep' >(See {{argument['author']}}'s reputation )</a>
+    </small>
   </div>
 </div>
 {% endif %}

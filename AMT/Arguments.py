@@ -1,6 +1,5 @@
-from os import error
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, session
+    Blueprint, g, redirect, render_template, request, url_for, session, jsonify
 )
 from werkzeug.exceptions import abort
 
@@ -193,6 +192,7 @@ def findElement():
 
 @bp.route("/showPositions/<int:issueID>")
 def showPositions(issueID):
+#    request.script_root = url_for('Arguments.getReputation', _external=True)
     userRate= None
     username = session.get('username')
     if username:
@@ -256,3 +256,13 @@ def search():
                 error = "No matches found"
 
     return render_template('Arguments/Search.html', error=error, searchResults=searchResults)
+
+@bp.route('/getReputation')
+def getReputation():
+    username = request.args.get('username')
+    if username:
+        if username=="Anonymous":
+            return jsonify(reputation="Reputation cannot be shown for anonymous users")
+        reputation = Database().getUserReputation(username)
+        return jsonify(reputation=reputation)
+    return jsonify(reputation="Not found")

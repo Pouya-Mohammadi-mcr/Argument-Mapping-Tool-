@@ -4,7 +4,6 @@
   {{ super() }}
 {% endblock %}
 {% block header %}
-
 <div class="card" style="width: 22rem; border-color: #376E70;">
   <div class="card-header text-light" style="background-color: #376E70;" >
     Topic
@@ -76,7 +75,6 @@
     {{ error }}!
   </div>
 {% else %}
-
 <p class="h4" ><span style="color: #DB7A93;">Position(s)</span>  taken on this Topic:</p>
 {% for position in positions %}
 <div class="card" style="border-color: #DB7A93;">
@@ -105,7 +103,8 @@
     <a href="{{ url_for('Arguments.showArguments', elementID = position['id'] ) }}" class="card-text text-light">{{ position['title']  }}</a>
   </div>
   <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
-    <small class="text-muted"> Created on {{ position['date'] }} by {{position['author']}}</small>
+    <small class="text-muted"> Created on {{ position['date'] }} by {{position['author']}}        <i class="far fa-star mt-2" style="color:#376E70 ;"></i>
+      <a style="color: #376E70" authorUsername="{{position['author']}}" class='getRep' >(See {{position['author']}}'s reputation )</a></small>
   </div>
 </div>
 {% if not loop.last %}

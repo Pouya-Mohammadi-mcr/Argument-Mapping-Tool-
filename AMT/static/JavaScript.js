@@ -2,6 +2,19 @@ $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
 
+
+function notify() {
+  var a = $(this)
+  $.getJSON($SCRIPT_ROOT + '/getReputation', {
+    username : $(this).attr('authorUsername')
+  }, function(data) {
+    a.text('('+data.reputation+')');
+  });
+  return false;
+}
+$( ".getRep" ).on( "click", notify );
+
+
 //For default relations
 function selectRadio(radioBoxID, relation) {
     const textBox = document.getElementById("relation");
@@ -37,7 +50,4 @@ var myInput = document.getElementById('myInput')
 myModal.addEventListener('shown.bs.modal', function () {
   myInput.focus()
 })
-
-
-
 

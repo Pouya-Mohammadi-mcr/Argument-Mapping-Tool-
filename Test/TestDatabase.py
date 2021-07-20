@@ -234,5 +234,13 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(node3, 7, "The id for the third matched node was not returned correctly")
         self.assertEqual(node4, 20, "The id for the fourth matched node was not returned correctly")
 
+    def testGetUserReputation(self):
+        with self.app.app_context():
+            reputation = self.db.getUserReputation("Pouya")
+            reputation2 = self.db.getUserReputation("Rob")
+
+        self.assertEqual(reputation, 4.67,"The user's reputation was not returned correctly")
+        self.assertEqual(reputation2, 'No ratings avaialable' ,"The user's reputation was not returned correctly")
+
 if __name__ == '__main__':
     unittest.main()

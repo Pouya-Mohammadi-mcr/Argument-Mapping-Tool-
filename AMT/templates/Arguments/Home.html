@@ -41,7 +41,10 @@ Topics
     <a class="card-text text-light" href="{{ url_for('Arguments.showPositions',issueID = issue.id) }}">{{ issue['title']  }}</a>
   </div>
   <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
-    <small class="text-muted"> Created on {{ issue['date'] }} by {{issue['author']}}</small>
+    <small class="text-muted"> Created on {{ issue['date'] }} by {{issue['author']}}
+      <i class="far fa-star mt-2" style="color:#376E70 ;"></i>
+      <a style="color: #376E70" authorUsername="{{issue['author']}}" class='getRep' >(See {{issue['author']}}'s reputation)</a>
+    </small>
   </div>
 </div>
 {% if not loop.last %}

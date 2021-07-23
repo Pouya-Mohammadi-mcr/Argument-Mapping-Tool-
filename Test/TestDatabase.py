@@ -16,10 +16,9 @@ class TestDatabase(unittest.TestCase):
         with self.app.app_context():
             self.db = Database()
 
-#    def testClose(self):
-#        with self.app.app_context():
-#            self.db.close()
-#        self.assertFalse(self.db, "The connection was not closed")
+    def testClose(self):
+        with self.app.app_context():
+            self.db.close()
 
     def testFindIssues(self):
         with self.app.app_context():
@@ -239,7 +238,7 @@ class TestDatabase(unittest.TestCase):
             reputation = self.db.getUserReputation("Pouya")
             reputation2 = self.db.getUserReputation("Rob")
 
-        self.assertEqual(reputation, 4.67,"The user's reputation was not returned correctly")
+        self.assertEqual(reputation, 'Reputation: 4.67/5, number of rated contributions: 3',"The user's reputation was not returned correctly")
         self.assertEqual(reputation2, 'No ratings avaialable' ,"The user's reputation was not returned correctly")
 
 if __name__ == '__main__':

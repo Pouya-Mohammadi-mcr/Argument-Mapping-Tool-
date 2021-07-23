@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask
 import os
 
 
@@ -21,13 +21,13 @@ def create_app(test_config=None):
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
 
-#not testing neo4j
+#When not testing, use neo4j database
         app.config['database']='neo4j'
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
         
-#testing
+#When testing, use testdatabase
         app.config['database']='testdatabase'
 
     # ensure the instance folder exists

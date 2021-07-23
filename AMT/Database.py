@@ -1,12 +1,8 @@
 from flask import current_app, g
-from flask.cli import with_appcontext
 import csv
 import os
-
 import bcrypt
-import uuid
 import datetime
-
 from neo4j import GraphDatabase
 import logging
 from neo4j.exceptions import *
@@ -23,7 +19,6 @@ class Database():
                     password=row[1]
                     uri=row[2]
             self.driver = GraphDatabase.driver(uri, auth=(username, password))
-            #might be unnecessary
             g.db = self.driver
         else:
             self.driver = g.db
@@ -95,7 +90,6 @@ class Database():
         query = (
             "CREATE (u:User { username: $username, password: $password }) "
         )
-        #fix .encode 
         result = tx.run(query, username=username, password= bcrypt.hashpw(password.encode(), bcrypt.gensalt()) )
         try:
             return result
@@ -224,7 +218,6 @@ class Database():
                 return "ERROR"
             else:
                 return relatedElements
-        # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -244,7 +237,6 @@ class Database():
             "CREATE (u)-[:RAISED]->(i) "
             "Return i"
         )
-        #fix .encode 
         result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
             record = result.single()
@@ -269,7 +261,6 @@ class Database():
             "CREATE (u)-[:RAISED]->(i) "
             "Return i"
         )
-        #fix .encode 
         result = tx.run(query, title=title, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
             record = result.single()
@@ -299,7 +290,6 @@ class Database():
             "RETURN i, p"
 
         )
-        #fix .encode 
         result = tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
             relatedElements = ( [{"i": row["i"].id, "p": row["p"].id, "author": row["p"]["author"], }
@@ -320,7 +310,6 @@ class Database():
 
     @staticmethod
     def createAndReturnPositionAnonymous(tx, username, title, issueID):
-        #Does not check if the issueID is actually an ID for an ISSUE
         query = (
             "MATCH (u:User) "
             "WHERE u.username = $username "
@@ -332,7 +321,6 @@ class Database():
             "RETURN i, p"
 
         )
-        #fix .encode 
         result = tx.run(query, title=title, issueID=int(issueID), username=username, date=datetime.datetime.now().strftime("%B %d, %Y"))
         try:
             relatedElements = ( [{"i": row["i"].id, "p": row["p"].id, "author": row["p"]["author"],}
@@ -393,7 +381,6 @@ class Database():
             "RETURN n1, r, n2"
 
         )
-        #fix .encode 
         result = tx.run(query, title=relationType, username=username, date=datetime.datetime.now().strftime("%B %d, %Y"), node1=int(node1), node2=int(node2))
         try:
             foundNodes = ( [{"n1": row["n1"].id, "r": row["r"].id, "n2": row["n2"].id}
@@ -402,7 +389,6 @@ class Database():
                 return "ERROR"
             else:
                 return foundNodes
-        # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -470,7 +456,6 @@ class Database():
                 return "ERROR"
             else:
                 return foundPositions
-        # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -488,7 +473,6 @@ class Database():
             "WHERE id(e) = $elementID "
             "Return e"
         )
-        #fix .encode 
         result = tx.run(query,  elementID=elementID)
 
         try:
@@ -529,7 +513,6 @@ class Database():
                 return "ERROR"
             else:
                 return arguments
-        # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -565,7 +548,6 @@ class Database():
                 return "ERROR"
             else:
                 return foundNodes
-        # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))

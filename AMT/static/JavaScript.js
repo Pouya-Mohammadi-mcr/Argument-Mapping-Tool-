@@ -1,18 +1,7 @@
+//Activate Bootstrap's tooltip
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
-
-
-function notify() {
-  var a = $(this)
-  $.getJSON($SCRIPT_ROOT + '/getReputation', {
-    username : $(this).attr('authorUsername')
-  }, function(data) {
-    a.text('('+data.reputation+')');
-  });
-  return false;
-}
-$( ".getRep" ).on( "click", notify );
 
 
 //For default relations
@@ -43,7 +32,7 @@ function copyToClipboard(id) {
     alert("Copied ID: " + copyText.value + " to clipboard");
   }
 
-
+//Modal
 var myModal = document.getElementById('myModal')
 var myInput = document.getElementById('myInput')
 

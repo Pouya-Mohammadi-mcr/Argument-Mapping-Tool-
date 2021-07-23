@@ -1,7 +1,6 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for, session, jsonify
 )
-from werkzeug.exceptions import abort
 
 from AMT.Auth import loginRequired
 from AMT.Database import Database
@@ -192,7 +191,6 @@ def findElement():
 
 @bp.route("/showPositions/<int:issueID>")
 def showPositions(issueID):
-#    request.script_root = url_for('Arguments.getReputation', _external=True)
     userRate= None
     username = session.get('username')
     if username:

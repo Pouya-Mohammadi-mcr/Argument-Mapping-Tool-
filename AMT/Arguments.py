@@ -207,6 +207,10 @@ def showPositions(issueID):
 
 @bp.route("/showArguments/<int:elementID>")
 def showArguments(elementID):
+    parent = request.args.get('parent', None)
+    if parent:
+        parent = int(parent)
+
     userRate= None
     username = session.get('username')
     if username:

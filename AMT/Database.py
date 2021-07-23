@@ -130,20 +130,21 @@ class Database():
     @staticmethod
     def createAndReturnArgumentAndRelation(tx, username, title, elementID, relation):
         query = (
+            "WITH ['Issue'] AS issue, ['User'] AS user " 
+            
             "MATCH (u:User) "
             "WHERE u.username = $username "
 
-            "WITH ['Issue'] AS issue, ['User'] AS user " 
             "MATCH (e) "
-            "WHERE id(e) = $elementID AND labels(e)<>issue AND labels(e)<>user "
+            "WHERE (id(e) = $elementID AND labels(e)<>issue AND labels(e)<>user) "
 
             "CREATE (a:Argument { title: $title, date: $date, author: $username }) "
-            "CREATE (u)-[:MADE]->(a) "
+            "MERGE (u)-[:MADE]->(a) "
 
             "CREATE (r:Relation { title: $relation, date: $date }) "
-            "CREATE (u)-[:CREATED]->(r) "
-            "CREATE (r)-[:FROM]->(a) "
-            "CREATE (r)-[:TO]->(e) "
+            "MERGE (u)-[:CREATED]->(r) "
+            "MERGE (r)-[:FROM]->(a) "
+            "MERGE (r)-[:TO]->(e) "
 
             "RETURN a, r, e"
         )
@@ -193,20 +194,21 @@ class Database():
     @staticmethod
     def createAndReturnArgumentAndRelationAnonymous(tx, username, title, elementID, relation):
         query = (
+            "WITH ['Issue'] AS issue, ['User'] AS user " 
+
             "MATCH (u:User) "
             "WHERE u.username = $username "
 
-            "WITH ['Issue'] AS issue, ['User'] AS user "     
             "MATCH (e) "
-            "WHERE id(e) = $elementID AND labels(e)<>issue AND labels(e)<>user "
+            "WHERE (id(e) = $elementID AND labels(e)<>issue AND labels(e)<>user) "
 
             "CREATE (a:Argument { title: $title, date: $date, author: 'Anonymous' }) "
-            "CREATE (u)-[:MADE]->(a) "
+            "MERGE (u)-[:MADE]->(a) "
 
             "CREATE (r:Relation { title: $relation, date: $date }) "
-            "CREATE (u)-[:CREATED]->(r) "
-            "CREATE (r)-[:FROM]->(a) "
-            "CREATE (r)-[:TO]->(e) "
+            "MERGE (u)-[:CREATED]->(r) "
+            "MERGE (r)-[:FROM]->(a) "
+            "MERGE (r)-[:TO]->(e) "
 
             "RETURN a, r, e"
         )

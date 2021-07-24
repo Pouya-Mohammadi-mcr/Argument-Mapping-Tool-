@@ -60,12 +60,19 @@ Search
     <div class="card-body" style="background-color: #DB7A93;">
     {% if elementLabel[0]=='Topic' %}
     <a class="card-text text-light" href="{{ url_for('Arguments.showPositions',issueID = element.id) }}">{{ element['title']  }}</a>
-    {% else %}
-    <a href="{{ url_for('Arguments.showArguments', elementID = element.id ) }}" class="card-text text-light">{{ element['title']  }}</a>
+    {% elif elementLabel[0]=='Position' %}
+    <a href="{{ url_for('Arguments.showArguments', elementID = element.id, isPosition='Yes' ) }}" class="form-control bg-transparent border-0 text-light"> {{element['title']}}</a>
+    {% elif elementLabel[0]=='Argument' %}
+    <a href="{{ url_for('Arguments.showArguments', elementID = element.id, isArgument='Yes' ) }}" class="form-control bg-transparent border-0 text-light"> {{element['title']}}</a>
+    {% elif elementLabel[0]=='Relation' %}
+    <a href="{{ url_for('Arguments.showArguments', elementID = element.id, isRelation='Yes' ) }}" class="form-control bg-transparent border-0 text-light"> {{element['title']}}</a>
     {% endif %}
   </div>
   <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
-    <small class="text-muted"> Created on {{ element['date'] }} by {{element['author']}}</small>
+    <small class="text-muted"> Created on {{ element['date'] }} by {{element['author']}}
+      <i class="far fa-star mt-2" style="color:#376E70 ;"></i>
+      <a style="color: #376E70" authorUsername="{{element['author']}}" class='getRep' >(See {{element['author']}}'s reputation)</a>
+    </small>
   </div>
 </div>
 {% if not loop.last %}

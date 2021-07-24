@@ -6,11 +6,41 @@
 {% block header %}
 <div class="card" style="width: 22rem; border-color: #376E70;">
   <div class="card-header text-light" style="background-color: #376E70;" >
+    <div class="d-flex flex-row">
+      <div class="flex-fill text-center" >
     Topic
-    {% if issue['rateSum'] %}
-    <i class="far fa-star fs-6 d-flex justify-content-center" style="color:#FFC700 ;"> {{ ['%0.2f'| format(issue['rateSum']/issue['ratesNo']|float), '/', 5, ' ','(', issue['ratesNo'], ')']|join}}</i>
-  {% endif %}
+      </div>
+  <a class="btn btn-sm" style="border: 1px solid white; color: white;" data-bs-toggle="collapse" data-bs-target="#mainNodeInfo" aria-expanded="false" aria-controls="collapseExample">
+    <i class="fas fa-bars"></i> 
+</a>
+</div>
+
+
+<div class="collapse mt-2" id="mainNodeInfo">
+
+  {% if issue['rateSum'] %}
+    <div class="input-group mb-1 d-flex justify-content-center">
+      <i class="far fa-star fs-6 " style="color:#FFC700 ;"> {{ ['%0.2f'| format(issue['rateSum']/issue['ratesNo']|float), '/', 5, ' ','(', issue['ratesNo'], ')']|join}}</i>
+    </div>
+    {% endif %}
+
+    <div class="input-group mb-1">
+    <div class="input-group-prepend">
+      <span class="input-group-text bg-transparent border-0 text-light">ID:</span>
+    </div>
+    <input type="text" class="form-control bg-transparent border-0 text-light" id="{{issue.id}}" value='{{ issue.id }}' readonly>
+    <div class="input-group-append">
+      <button type="button" class="btn btn-sm text-light" style="border: 1px solid white;" onclick=copyToClipboard({{ issue.id|safe }});>Copy ID</button>
+    </div>
   </div>
+</div>
+
+
+
+
+
+</div>
+
   <div class="card-body">
     <h5 class="card-title text-dark">{{issue['title']}}</h5>
     <a href="{{ url_for('Arguments.createPosition', issue = issue.id ) }}" class="btn text-light" style="background-color: #376E70;">Take a new position</a>
@@ -100,7 +130,7 @@
     </div>
   </div>
     <div class="card-body" style="background-color: #DB7A93;">
-    <a href="{{ url_for('Arguments.showArguments', elementID = position['id'] ) }}" class="card-text text-light">{{ position['title']  }}</a>
+    <a href="{{ url_for('Arguments.showArguments', elementID = position['id'], isPosition = 'Yes' ) }}" class="card-text text-light">{{ position['title']  }}</a>
   </div>
   <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
     <small class="text-muted"> Created on {{ position['date'] }} by {{position['author']}}        <i class="far fa-star mt-2" style="color:#376E70 ;"></i>

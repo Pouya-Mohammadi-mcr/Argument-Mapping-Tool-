@@ -181,8 +181,12 @@ def findElement():
                 error = "Element not found"
             elif list(element.labels)[0] == "Issue":
                 return redirect(url_for('Arguments.showPositions',issueID = elementID))
-            elif list(element.labels)[0] == "Position" or list(element.labels)[0] == "Argument" or list(element.labels)[0] == "Relation":
-                return redirect(url_for('Arguments.showArguments',elementID = elementID))
+            elif list(element.labels)[0] == "Position":
+                return redirect(url_for('Arguments.showArguments',elementID = elementID, isPosition = 'Yes'))
+            elif list(element.labels)[0] == "Argument":
+                return redirect(url_for('Arguments.showArguments',elementID = elementID, isArgument = 'Yes'))
+            elif list(element.labels)[0] == "Relation":
+                return redirect(url_for('Arguments.showArguments',elementID = elementID, isRelation ='Yes'))
             else:
                 error = "Element not found"
 
@@ -207,9 +211,27 @@ def showPositions(issueID):
 
 @bp.route("/showArguments/<int:elementID>")
 def showArguments(elementID):
-    parent = request.args.get('parent', None)
-    if parent:
-        parent = int(parent)
+    #When its a position page
+    isPosition = request.args.get('isPosition', None)
+    parentTopic = None
+    if isPosition  == 'Yes':
+        parentTopic = Database().getParentTopic(int(elementID))
+
+    #When its an argument page
+    isArgument = request.args.get('isArgument', None)
+    outgoingArgs = None
+    if isArgument  == 'Yes':
+        outgoingArgsTemp = Database().getOutgoingArguments(int(elementID))
+        if outgoingArgsTemp != 'ERROR':
+            outgoingArgs = outgoingArgsTemp
+
+    #When its a relation page     
+    isRelation = request.args.get('isRelation', None)
+    relFrom = None
+    relTo = None
+    if isRelation == 'Yes':
+        relFrom = Database().getRelFrom(int(elementID))
+        relTo = Database().getRelTo(int(elementID))
 
     userRate= None
     username = session.get('username')
@@ -223,7 +245,7 @@ def showArguments(elementID):
     if arguments == "ERROR":
         error = "No arguments have been made on this element"
     element = Database().getSingleElement(elementID)
-    return render_template('Arguments/ShowArguments.html', arguments=arguments, element=element, error=error, userRate=userRate)
+    return render_template('Arguments/ShowArguments.html', arguments=arguments, element=element, error=error, userRate=userRate, parentTopic=parentTopic, outgoingArgs=outgoingArgs, relFrom=relFrom, relTo=relTo)
 
 @bp.route("/rate", methods=('GET', 'POST'))
 @loginRequired

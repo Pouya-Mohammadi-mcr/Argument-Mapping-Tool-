@@ -241,5 +241,35 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(reputation, 'Reputation: 4.67/5, number of rated contributions: 3',"The user's reputation was not returned correctly")
         self.assertEqual(reputation2, 'No ratings avaialable' ,"The user's reputation was not returned correctly")
 
+
+    def testGetRelFrom(self):
+        with self.app.app_context():
+            relFrom = Database().getRelFrom(21)
+        self.assertEqual(relFrom.id, 20 ,"The relation's 'from' node was not returned correctly")
+
+    def testGetRelTo(self):
+        with self.app.app_context():
+            relTo = Database().getRelTo(21)
+        self.assertEqual(relTo.id, 2 ,"The relation's 'to' node was not returned correctly")
+
+    def testGetParentTopic(self):
+        with self.app.app_context():
+            relTo = Database().getParentTopic(2)
+        self.assertEqual(relTo.id, 1 ,"The position's parent node was not returned correctly")
+
+    def testGetParentTopic(self):
+        with self.app.app_context():
+            relTo = Database().getParentTopic(2)
+        self.assertEqual(relTo.id, 1 ,"The position's parent node was not returned correctly")
+
+
+    def testGetOutgoingArguments(self):
+        with self.app.app_context():
+            arguments = self.db.getOutgoingArguments(7)
+            self.assertEqual(arguments[0]['relation'],"Supports", "The first argument's relation was not returned correctly")
+            self.assertEqual(arguments[0]['relationID'],8, "The first argument's relation ID was not returned correctly")
+            self.assertEqual(arguments[0]['title'],"No", "The first supported argument's title was not returned correctly")
+            self.assertEqual(list(arguments[0]['label'])[0],"Position", "The first supported argument's label was not returned correctly")
+
 if __name__ == '__main__':
     unittest.main()

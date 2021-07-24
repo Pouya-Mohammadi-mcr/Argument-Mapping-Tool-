@@ -489,6 +489,7 @@ class Database():
                 query=query, exception=exception))
             raise
 
+#Gets arguments incoming relations and elements, opposite of 'getOutgoingArguments'
     def getArguments(self, elementID):
         with self.driver.session(database=current_app.config['database']) as session:
             result = session.read_transaction(self.findAndReturnArguments, elementID)
@@ -639,6 +640,111 @@ class Database():
             else:
                 value = "ERROR"
             return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+
+    def getRelFrom(self, relationNodeID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.getAndReturnRelFrom, relationNodeID)
+            return result
+
+    @staticmethod
+    def getAndReturnRelFrom(tx, relationNodeID):
+        query = (
+            "MATCH (r:Relation) "
+            "WHERE id(r) = $relationNodeID "
+            "MATCH (r)-[:FROM]->(f) "
+            "Return f"
+        )
+        result = tx.run(query, relationNodeID=relationNodeID)
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+
+
+    def getRelTo(self, relationNodeID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.getAndReturnRelTo, relationNodeID)
+            return result
+
+    @staticmethod
+    def getAndReturnRelTo(tx, relationNodeID):
+        query = (
+            "MATCH (r:Relation) "
+            "WHERE id(r) = $relationNodeID "
+            "MATCH (r)-[:TO]->(t) "
+            "Return t"
+        )
+        result = tx.run(query, relationNodeID=relationNodeID)
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+
+    def getParentTopic(self, positionNodeID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.getAndReturnParentTopic, positionNodeID)
+            return result
+
+    @staticmethod
+    def getAndReturnParentTopic(tx, positionNodeID):
+        query = (
+            "MATCH (p:Position) "
+            "WHERE id(p) = $positionNodeID "
+            "MATCH (p)-[:ANSWERS]->(t) "
+            "Return t"
+        )
+        result = tx.run(query, positionNodeID=positionNodeID)
+        try:
+            record = result.single()
+            value = record.value()
+            return value
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+
+#Gets arguments outgoing relations and elements, opposite of 'getArguments'
+    def getOutgoingArguments(self, argumentID):
+        with self.driver.session(database=current_app.config['database']) as session:
+            result = session.read_transaction(self.findAndReturnOutgoingArguments, argumentID)
+            return result
+
+    @staticmethod
+    def findAndReturnOutgoingArguments(tx, argumentID):
+        query = (
+            "MATCH (a:Argument) "
+            "WHERE id(a) = $argumentID "
+            "WITH (a)"
+            "MATCH (a)<-[:FROM]-(r:Relation) "
+            "WITH (r)"
+            "MATCH (e)<-[:TO]-(r:Relation) "
+            "RETURN e, r.title, id(r) "
+            "ORDER BY -e.rateSum/e.ratesNo"
+        )
+        result = tx.run(query, argumentID=argumentID)
+        try:
+            arguments = ( [{"relation": row['r.title'], "relationID": row['id(r)'], "title": row["e"]["title"], "id": row["e"].id, "date": row["e"]["date"], "author": row["e"]["author"], "rateSum": row["e"]["rateSum"], "ratesNo": row["e"]["ratesNo"], "label": row["e"].labels,}
+                    for row in result] )
+            if len(arguments) == 0:
+                return "ERROR"
+            else:
+                return arguments
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))

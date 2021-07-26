@@ -64,8 +64,13 @@ class TestDatabase(unittest.TestCase):
             self.db.deleteElement(argID)
             self.db.deleteElement(relationID)
 
+            #test return error with an invalid node id
+            relatedElements2 = self.db.createArgumentAndRelation("Pouya","some text for the second test argument", 9999999999, "Supports")
+
         self.assertEqual(relatedElementID, 6, "The argument and relation creation transaction was not run correctly")
         self.assertEqual(argumentAuthor, "Pouya", "The argument's author is not correct")
+
+        self.assertEqual(relatedElements2, "ERROR", "It should have returned an error")
 
     def testCreateArgumentAnonymous(self):
         with self.app.app_context():
@@ -88,8 +93,13 @@ class TestDatabase(unittest.TestCase):
             self.db.deleteElement(argID)
             self.db.deleteElement(relationID)
 
+            #test return error with an invalid node id
+            relatedElements2 = self.db.createArgumentAndRelationAnonymous("Pouya","some text for the second test argument", 9999999999, "Supports")
+
         self.assertEqual(relatedElementID, 6, "The argument and relation creation transaction was not run correctly")
         self.assertEqual(argumentAuthor, "Anonymous", "The argument's author is not correct")
+
+        self.assertEqual(relatedElements2, "ERROR", "It should have returned an error")
 
     def testCreateIssue(self):
         with self.app.app_context():
@@ -115,8 +125,14 @@ class TestDatabase(unittest.TestCase):
             positionAuthor = positionAndIssue[0]['author']
             #delete the position created
             self.db.deleteElement(posID)
+
+            #test return error with an invalid node id
+            positionAndIssue2 = self.db.createPosition("Pouya","some text for the test position", 9999999999)
+
         self.assertEqual(issueID, 1,"The position was not created")
         self.assertEqual(positionAuthor, "Pouya","The position was not created")
+
+        self.assertEqual(positionAndIssue2, "ERROR","It should have returned an error")
 
     def testCreatePositionAnonymous(self):
         with self.app.app_context():
@@ -126,8 +142,14 @@ class TestDatabase(unittest.TestCase):
             positionAuthor = positionAndIssue[0]['author']
             #delete the position created
             self.db.deleteElement(posID)
+
+            #test return error with an invalid node id
+            positionAndIssue2 = self.db.createPositionAnonymous("Pouya","some text for the test position", 9999999999)
+
         self.assertEqual(issueID, 1,"The position was not created")
         self.assertEqual(positionAuthor, "Anonymous","The position was not created")
+
+        self.assertEqual(positionAndIssue2, "ERROR","It should have returned an error")
 
     def testMatchPassword(self):
         with self.app.app_context():
@@ -142,8 +164,14 @@ class TestDatabase(unittest.TestCase):
             node2ID = elementsAndRelation[0]['n2']
             #delete the relation created
             self.db.deleteElement(relationID)
+
+            #test return error with an invalid node id
+            elementsAndRelation2 = self.db.createRelation("Pouya", 9999999999, 99999999999999, "Opposes")
+
         self.assertEqual(node1ID, 7,"The relation was not created")
         self.assertEqual(node2ID, 3,"The relation was not created")
+
+        self.assertEqual(elementsAndRelation2, "ERROR","It should have returned an error")
 
 #starting TDD
 
@@ -157,6 +185,10 @@ class TestDatabase(unittest.TestCase):
             self.assertEqual(positions[1]['id'], 6, "The second position's id was not returned correctly")
             self.assertEqual(positions[1]['date'], "June 30, 2021", "The second position's date was not returned correctly")
 
+            #test return error with an invalid node id
+            positions2 = self.db.getPositions(9999999999)
+            self.assertEqual(positions2, "ERROR","It should have returned an error")
+
     def testGetSignleElement(self):
         with self.app.app_context():
             element = self.db.getSingleElement(1)
@@ -164,7 +196,11 @@ class TestDatabase(unittest.TestCase):
             self.assertEqual(element['title'],"Should X company be allowed to sponsor a conference? " , "The element's title was not returned correctly")
             self.assertEqual(element.id, 1, "The element's id was not returned correctly")
             self.assertEqual(element['date'], "June 30, 2021", "The element's date was not returned correctly")
-        
+
+            #test return error with an invalid node id
+            element2 = self.db.getSingleElement(9999999999)
+            self.assertEqual(element2, "ERROR","It should have returned an error")
+
     def testGetArguments(self):
         with self.app.app_context():
             arguments = self.db.getArguments(2)
@@ -176,6 +212,10 @@ class TestDatabase(unittest.TestCase):
             self.assertEqual(arguments[3]['relation'],"Asks a question", "The third argument's relation was not returned correctly")
             self.assertEqual(arguments[3]['title'],"Does it mean it should be able to sponsor any conference? or some specific ones?", "The custom argument's title was not returned correctly")
 
+            #test return error with an invalid node id
+            arguments2 = self.db.getArguments("anything invalid")
+            self.assertEqual(arguments2, "ERROR","It should have returned an error")
+
     def testRate(self):
         with self.app.app_context():
             issue = self.db.createIssue("Pouya","some text for the test issue for rating")
@@ -186,7 +226,7 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(rate, 5,"The new rating was not returned correctly")
         self.assertEqual(rateSum, 5,"The sum of ratings was not returned correctly")
         self.assertEqual(ratesNo, 1,"The total number of rates was not returned correctly")
-        
+
         with self.app.app_context():
             elementAndRelation = self.db.rate("Jack", issue.id, 4)
             rate = elementAndRelation[0]['rate']
@@ -203,9 +243,14 @@ class TestDatabase(unittest.TestCase):
             ratesNo = elementAndRelation[0]['ratesNo']
             #delete the issue created
             self.db.deleteElement(issue.id)
+
+           #test return error with an invalid node id
+            elementAndRelation2 = self.db.rate("Pouya", 99999999, 5)
+
         self.assertEqual(rate, 3,"The new rating was not returned correctly")
         self.assertEqual(rateSum, 7,"The sum of ratings was not returned correctly")
         self.assertEqual(ratesNo, 2,"The total number of rates was not returned correctly")
+        self.assertEqual(elementAndRelation2, "ERROR","It should have returned an error")
 
     def testGetUserRate(self):
         with self.app.app_context():
@@ -241,7 +286,6 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(reputation, 'Reputation: 4.67/5, number of rated contributions: 3',"The user's reputation was not returned correctly")
         self.assertEqual(reputation2, 'No ratings avaialable' ,"The user's reputation was not returned correctly")
 
-
     def testGetRelFrom(self):
         with self.app.app_context():
             relFrom = Database().getRelFrom(21)
@@ -270,6 +314,10 @@ class TestDatabase(unittest.TestCase):
             self.assertEqual(arguments[0]['relationID'],8, "The first argument's relation ID was not returned correctly")
             self.assertEqual(arguments[0]['title'],"No", "The first supported argument's title was not returned correctly")
             self.assertEqual(list(arguments[0]['label'])[0],"Position", "The first supported argument's label was not returned correctly")
+
+           #test return error with an invalid node id
+            arguments2 = self.db.getOutgoingArguments(99999999999)
+            self.assertEqual(arguments2, "ERROR","It should have returned an error")
 
 if __name__ == '__main__':
     unittest.main()

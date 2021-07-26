@@ -637,8 +637,6 @@ class Database():
             record = result.single()
             if record:
                 value = record.value()
-            else:
-                value = "ERROR"
             return value
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(

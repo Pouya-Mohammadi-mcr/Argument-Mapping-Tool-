@@ -29,8 +29,12 @@ class Database():
         
     def findIssues(self):
         with self.driver.session(database=current_app.config['database']) as session:
-            result = session.read_transaction(self.findAndReturnIssues)
-            return result
+            try:
+                result = session.read_transaction(self.findAndReturnIssues)
+                return result
+            except ServiceUnavailable as exception:
+                return("SERROR")
+           
 
     @staticmethod
     def findAndReturnIssues(tx):
@@ -38,7 +42,6 @@ class Database():
             "MATCH (i:Issue) "
             "RETURN i "
             "ORDER BY -i.rateSum/i.ratesNo"
-
         )
         result = tx.run(query)
         try:

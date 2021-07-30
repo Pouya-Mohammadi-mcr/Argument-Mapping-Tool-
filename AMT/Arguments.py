@@ -12,7 +12,9 @@ bp = Blueprint('Arguments', __name__)
 def index():
     error = None
     issues = Database().findIssues()
-    if issues=="ERROR":
+    if issues=="SERROR":
+        error="Service Unavaibale"
+    elif issues=="ERROR":
         error="No topics found"
     return render_template('Arguments/Home.html', issues=issues, error=error)
 

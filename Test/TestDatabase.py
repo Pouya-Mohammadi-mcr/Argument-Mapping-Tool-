@@ -181,9 +181,14 @@ class TestDatabase(unittest.TestCase):
             self.assertEqual(positions[0]['title'], "Yes", "The first position's title was not returned correctly")
             self.assertEqual(positions[0]['id'], 2, "The first position's id was not returned correctly")
             self.assertEqual(positions[0]['date'], "June 30, 2021", "The first position's date was not returned correctly")
+            self.assertEqual(positions[0]['supportSum'], 2, "The first position's number of supports was not returned correctly")
+            self.assertEqual(positions[0]['opposeSum'], 1, "The first position's number of opposing arguments was not returned correctly")
+
             self.assertEqual(positions[1]['title'], "No", "The second position's title was not returned correctly")
             self.assertEqual(positions[1]['id'], 6, "The second position's id was not returned correctly")
             self.assertEqual(positions[1]['date'], "June 30, 2021", "The second position's date was not returned correctly")
+            self.assertEqual(positions[1]['supportSum'], 1, "The second position's number of supports was not returned correctly")
+            self.assertEqual(positions[1]['opposeSum'], 0, "The second position's number of opposing arguments was not returned correctly")
 
             #test return error with an invalid node id
             positions2 = self.db.getPositions(9999999999)

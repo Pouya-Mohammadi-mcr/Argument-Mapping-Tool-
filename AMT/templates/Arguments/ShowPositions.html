@@ -114,7 +114,6 @@
         <span class="input-group-text bg-transparent border-0">Position ID:</span>
       </div>
       <input type="text" class="form-control bg-transparent border-0" id="{{ position['id'] }}" value='{{ position["id"] }}' readonly>
-      
       {% if position['rateSum'] %}
       <i class="far fa-star mt-2" style="color:#FFC700 ;"></i>
       <input type="text" class="form-control bg-transparent border-0" value="{{ ['%0.2f'| format(position['rateSum']/position['ratesNo']|float), '/', 5, ' ','(', position['ratesNo'], ')']|join}}" readonly>
@@ -132,10 +131,16 @@
     <div class="card-body" style="background-color: #DB7A93;">
     <a href="{{ url_for('Arguments.showArguments', elementID = position['id'], isPosition = 'Yes' ) }}" class="card-text text-light">{{ position['title']  }}</a>
   </div>
-  <div class="card-footer bg-transparent" style="border-color: #DB7A93;">
-    <small class="text-muted"> Created on {{ position['date'] }} by {{position['author']}}        <i class="far fa-star mt-2" style="color:#376E70 ;"></i>
-      <a style="color: #376E70" authorUsername="{{position['author']}}" class='getRep' >(See {{position['author']}}'s reputation)</a></small>
-  </div>
+  <div class="card-footer bg-transparent d-flex" style="border-color: #DB7A93;">
+    <div class="flex-grow-1">
+    <small class="text-muted "> Created on {{ position['date'] }} by {{position['author']}}        <i class="far fa-star mt-2" style="color:#376E70 ;"></i>
+      <a style="color: #376E70" authorUsername="{{position['author']}}" class='getRep' >(See {{position['author']}}'s reputation)</a>
+    </small>
+    </div>
+    <div>
+      <span> Pros:&nbsp;<span class="text-success"> {{position['supportSum']}} </span>, Cons:&nbsp;<span class="text-danger">{{position['opposeSum']}} </span></span>
+    </div>
+    </div>
 </div>
 {% if not loop.last %}
   <hr style="color: #376E70; height: 1pt;">

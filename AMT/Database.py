@@ -450,12 +450,16 @@ class Database():
             "MATCH (i:Issue) "
             "WHERE id(i) = $issueID "
             "MATCH (i)<-[:ANSWERS]-(p:Position) "
-            "RETURN p "
+            "OPTIONAL MATCH (s:Argument)<-[:FROM]-(r1:Relation {title:'Supports'})-[:TO]->(p) "
+            "WITH p, COUNT(s) AS supportSum "
+            "OPTIONAL MATCH (o:Argument)<-[:FROM]-(r2:Relation {title:'Opposes'})-[:TO]->(p) "
+
+            "RETURN p, supportSum, Count(o) "
             "ORDER BY -p.rateSum/p.ratesNo"
         )
         result = tx.run(query, issueID=issueID)
         try:
-            foundPositions = ( [{"title": row["p"]["title"], "id": row["p"].id, "date": row["p"]["date"], "author": row["p"]["author"], "rateSum": row["p"]["rateSum"], "ratesNo": row["p"]["ratesNo"]}
+            foundPositions = ( [{"title": row["p"]["title"], "id": row["p"].id, "date": row["p"]["date"], "author": row["p"]["author"], "rateSum": row["p"]["rateSum"], "ratesNo": row["p"]["ratesNo"], "supportSum":row["supportSum"], "opposeSum":row["Count(o)"]}
                     for row in result] )
             if len(foundPositions) == 0:
                 return "ERROR"

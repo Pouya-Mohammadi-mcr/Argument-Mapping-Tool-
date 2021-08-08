@@ -16,7 +16,7 @@ Make an Argument
   <form action="{{ url_for('Arguments.findElement') }}" method="post">
       {{ success }}! 
       <input class="form-control me-2" type="hidden" name="elementID" id="elementID" placeholder="Find element by ID " aria-label="Search" value="{{argumentID}}" required>
-      <button class="btn btn-sm text-light" style="background-color: #DB7A93;" type="submit"> ID: {{argumentID}}</button>
+      <button class="btn btn-sm text-light" style="background-color: #DB7A93;" type="submit"> Click here to open your new argument page with ID: {{argumentID}}</button>
     </form>
   </div>
 {% endif %}

@@ -45,14 +45,14 @@ def createArgument():
                 if anonymous:
                     result = Database().createArgumentAndRelationAnonymous(g.user['username'],argument, elementID, relation)
                     if result == "ERROR":
-                        error= "The element you are referring to does not exist"
+                        error= "The element you are referring to is not valid, or it does not exist"
                     else:
                         success = "Your argument and its relation are succesfully created"
                         argumentID = result[0]['a']
                 else:
                     result = Database().createArgumentAndRelation(g.user['username'],argument, elementID, relation)
                     if result == "ERROR":
-                        error= "The element you are referring to does not exist"
+                        error= "The element you are referring to is not valid, or it does not exist"
                     else:
                         success = "Your argument and its relation are succesfully created" 
                         argumentID = result[0]['a']
@@ -91,6 +91,7 @@ def createIssue():
                 result = Database().createIssue(g.user['username'],issue)
             success = "Your topic is succesfully created"
             issueID = result.id
+            return redirect(url_for('Arguments.showPositions',issueID = issueID))
 
     
     return render_template('Arguments/CreateIssue.html', error=error, success=success, issueID=issueID)
@@ -144,7 +145,11 @@ def createRelation():
     error = None   
     success = None
     relationID = None
+    fromElement = None
 
+    fromElement = request.args.get('fromElement', None)
+    if fromElement:
+        fromElement = int(fromElement)
 
     if request.method == 'POST':
 
@@ -160,12 +165,12 @@ def createRelation():
         if error == None:
             result = Database().createRelation(g.user['username'],node1,node2,relation)
             if result == "ERROR":
-                error= "One or both the elements you are referring to do not exist"
+                error= "One or both the elements you are referring to either do not exist or are not valid elements"
             else:
                 success = "The relation is succesfully created"
                 relationID = result[0]['r']
     
-    return render_template('Arguments/CreateRelation.html', error=error, success=success, relationID=relationID)
+    return render_template('Arguments/CreateRelation.html', error=error, success=success, relationID=relationID, fromElement=fromElement)
 
 @bp.route("/findElement", methods=('GET', 'POST'))
 def findElement():
@@ -226,6 +231,9 @@ def showArguments(elementID):
         outgoingArgsTemp = Database().getOutgoingArguments(int(elementID))
         if outgoingArgsTemp != 'ERROR':
             outgoingArgs = outgoingArgsTemp
+        elif outgoingArgsTemp == 'ERROR':
+            outgoingArgs = 'Orphan'
+
 
     #When its a relation page     
     isRelation = request.args.get('isRelation', None)

@@ -10,13 +10,15 @@
       <div class="flex-fill text-center" >
     Topic
       </div>
-  <a class="btn btn-sm" style="border: 1px solid white; color: white;" data-bs-toggle="collapse" data-bs-target="#mainNodeInfo" aria-expanded="false" aria-controls="collapseExample">
+  <a class="btn btn-sm" style="border: 1px solid white; color: white;" data-bs-toggle="collapse" data-bs-target="#mainNodeInfo" aria-expanded="true" aria-controls="collapseExample">
     <i class="fas fa-bars"></i> 
 </a>
 </div>
 
 
-<div class="collapse mt-2" id="mainNodeInfo">
+<div class="collapse show mt-2" id="mainNodeInfo">
+
+  <hr style="color: white; height: 1pt;">
 
   {% if issue['rateSum'] %}
     <div class="input-group mb-1 d-flex justify-content-center">

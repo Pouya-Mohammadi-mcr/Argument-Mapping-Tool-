@@ -8,7 +8,9 @@
 Topics
 {% endblock %}
 {% block content %}
-
+<div class="d-flex justify-content-end">
+<a href="{{ url_for('Arguments.createIssue') }}" class="btn text-light mb-3" style="background-color: #376E70;">Create a new topic</a>
+</div>
 {% if error %}
 <div class="alert text-light" role="alert" style="background-color: #DB7A93;">
     {{ error }}!

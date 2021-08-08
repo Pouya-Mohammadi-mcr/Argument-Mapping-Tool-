@@ -17,14 +17,16 @@
 
       </div>
 
-    <a class="btn btn-sm" style="border: 1px solid white; color: white;" data-bs-toggle="collapse" data-bs-target="#mainNodeInfo" aria-expanded="false" aria-controls="collapseExample">
+    <a class="btn btn-sm" style="border: 1px solid white; color: white;" data-bs-toggle="collapse" data-bs-target="#mainNodeInfo" aria-expanded="true" aria-controls="collapseExample">
       <i class="fas fa-bars"></i> 
   </a>
   </div>
 
 
-  <div class="collapse mt-2" id="mainNodeInfo">
+  <div class="collapse show mt-2" id="mainNodeInfo">
  
+    <hr style="color: white; height: 1pt;">
+
     {% if element['rateSum'] %}
       <div class="input-group mb-1 d-flex justify-content-center">
         <i class="far fa-star fs-6 " style="color:#FFC700 ;"> {{ ['%0.2f'| format(element['rateSum']/element['ratesNo']|float), '/', 5, ' ','(', element['ratesNo'], ')']|join}}</i>
@@ -52,7 +54,12 @@
     </div>
     {% endif %}
 
-    {% if outgoingArgs %}
+    {% if outgoingArgs == 'Orphan' %}
+    <hr style="color: white; height: 1pt;">
+        <span style="color: #DB7A93;">This argument is not related to any elements</span>
+    <a href="{{ url_for('Arguments.createRelation', fromElement = element.id ) }}" class="btn text-light my-1" style="border: 1px solid white;"> {{'Connect it to an elemenet'}}</a>
+
+    {% elif outgoingArgs %}
     {% for outgoingArg in outgoingArgs%}
       {% set elementLabel = []%}
       {% for label in outgoingArg['label'] %}
@@ -127,7 +134,7 @@
 </div>
   <div class="card-body">
     <h5 class="card-title text-dark">{{element['title']}}</h5>
-    <a href="{{ url_for('Arguments.createArgument', element = element.id ) }}" class="btn text-light" style="background-color: #376E70;">Make a new argument</a>
+    <a href="{{ url_for('Arguments.createArgument', element = element.id ) }}" class="btn text-light" style="background-color: #376E70;">Make related argument</a>
 
 
     <!-- Button trigger modal -->

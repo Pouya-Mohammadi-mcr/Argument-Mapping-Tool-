@@ -16,7 +16,7 @@ Create a Relation
   <form action="{{ url_for('Arguments.findElement') }}" method="post">
       {{ success }}! 
       <input class="form-control me-2" type="hidden" name="elementID" id="elementID" placeholder="Find element by ID " aria-label="Search" value="{{relationID}}" required>
-      <button class="btn btn-sm text-light" style="background-color: #DB7A93;" type="submit"> ID: {{relationID}}</button>
+      <button class="btn btn-sm text-light" style="background-color: #DB7A93;" type="submit"> Click here to open your new relation page with ID: {{relationID}}</button>
     </form>
   </div>
 {% endif %}
@@ -46,9 +46,13 @@ Create a Relation
 <input type="text" class="form-control" id="relation" name="relation" title="Name this relation" placeholder="Name this relation" value="{{ request.form['relation'] }}" required><br>
 
 <label for="node1">From:</label><br>
-<input type="number" class="form-control" id="node1" name="node1" title="Enter the ID" value="{{ request.form['node1'] }}"  placeholder="Enter the ID of the first element" required><br>
+{% if fromElement != none %}
+<input type="number" class="form-control" id="node1" name="node1" title="Enter the ID of an argument" placeholder="Enter an argument ID" value="{{ fromElement }}" readonly><br>
+{% else %}
+<input type="number" class="form-control" id="node1" name="node1" title="Enter the ID of an argument" value="{{ request.form['node1'] }}"  placeholder="Enter an argument ID" required><br>
+{% endif %}
 <label for="node2">To:</label><br>
-<input type="number" class="form-control" id="node2" name="node2" title="Enter the ID" value="{{ request.form['node2'] }}"  placeholder="Enter the ID of the second element" required><br>
+<input type="number" class="form-control" id="node2" name="node2" value="{{ request.form['node2'] }}" data-toggle="tooltip" title="Can be a position or argument or relation ID" placeholder="Enter the ID of the second element" required><br>
 <div class="d-grid gap-2 mt-2">
   <input type="submit" value="Create" class="btn text-light" style="background-color: #376E70;">
   </div>

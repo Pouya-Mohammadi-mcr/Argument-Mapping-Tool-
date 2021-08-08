@@ -372,12 +372,14 @@ class Database():
     @staticmethod
     def createAndReturnRelation(tx, username, node1, node2, relationType):
         query = (
+            "WITH ['Issue'] AS issue, ['User'] AS user, ['Position'] AS position, , ['Relation'] AS relation " 
+
             "MATCH (u:User) "
             "WHERE u.username = $username "
             "MATCH (n1) "
-            "WHERE id(n1) = $node1 "
+            "WHERE id(n1) = $node1 AND labels(n1)<>issue AND labels(n1)<>user AND labels(n1)<>position AND labels(n1)<>relation "
             "MATCH (n2) "
-            "WHERE id(n2) = $node2 "
+            "WHERE id(n2) = $node2 AND labels(n2)<>issue AND labels(n2)<>user "
             "CREATE (r:Relation { title: $title, date: $date }) "
             "CREATE (u)-[:CREATED]->(r) "
             "CREATE (r)-[:FROM]->(n1) "
